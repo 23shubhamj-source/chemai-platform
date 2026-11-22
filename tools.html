@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chemistry Calculators & Tools Dashboard | ChemAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <div class="ambient-glow ambient-glow-1"></div>
+  
+  <header class="site-nav" role="banner">
+    <div class="container">
+      <div class="nav-container">
+        <a href="index.html" class="nav-brand" aria-label="ChemAI Home">
+          <div class="brand-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/>
+              <line x1="8.5" y1="2" x2="15.5" y2="2"/>
+            </svg>
+          </div>
+          <span>Chem<span class="brand-text-ai">AI</span></span>
+        </a>
+        <nav class="nav-links" id="siteNavLinks"><a href="index.html" class="nav-link ">Home</a><a href="index.html#ai-assistant" class="nav-link ">AI Assistant</a><a href="tools.html" class="nav-link active">Tools</a><a href="virtual-lab.html" class="nav-link ">Virtual Lab</a><a href="periodic-table.html" class="nav-link ">Periodic Table</a><a href="index.html#molecule-viewer" class="nav-link ">3D Molecules</a><a href="study-hub.html" class="nav-link ">Study Hub</a><a href="index.html#research" class="nav-link ">Research</a></nav>
+        <div class="nav-actions">
+          <button type="button" class="nav-search-btn" onclick="openSearchPalette()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <a href="virtual-lab.html" class="btn btn-primary btn-sm">Launch Lab</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
+    <div class="sec-head">
+      <span class="sec-eyebrow">Calculators &amp; Solvers</span>
+      <h1 class="sec-title">Chemistry Tools Directory</h1>
+      <p class="sec-subtitle">Instant mathematical and conceptual solvers with step-by-step derivations.</p>
+    </div>
+    <div class="tools-filter-bar">
+      <ul class="category-tabs">
+        <li><button class="category-tab active" data-category="all">All Tools</button></li>
+        <li><button class="category-tab" data-category="essentials">Student Essentials</button></li>
+        <li><button class="category-tab" data-category="molecular">Molecular Tools</button></li>
+      </ul>
+      <div class="tools-search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="toolsSearchInput" placeholder="Filter tools by keyword...">
+      </div>
+    </div>
+    <div class="tools-grid">
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-emerald"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></div><span class="chip chip-emerald">Essential</span></div>
+        <h3>Chemical Equation Balancer</h3>
+        <p>Balances chemical equations with linear algebra mass conservation.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('balancer')">Open Balancer →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-cobalt"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><span class="chip chip-cobalt">Essential</span></div>
+        <h3>Molar Mass Calculator</h3>
+        <p>Calculates exact molecular weight and elemental mass percentages.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('molarmass')">Open Calculator →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-violet"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span class="chip chip-violet">Essential</span></div>
+        <h3>pH &amp; pOH Calculator</h3>
+        <p>Converts between pH, pOH, [H+], and [OH-] with acidity classification.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('ph')">Open Calculator →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-emerald"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg></div><span class="chip chip-emerald">Essential</span></div>
+        <h3>Solution Dilution (M₁V₁ = M₂V₂)</h3>
+        <p>Computes required stock volumes and target concentrations.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('dilution')">Open Calculator →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-cobalt"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg></div><span class="chip chip-cobalt">Essential</span></div>
+        <h3>Ideal Gas Law (PV = nRT)</h3>
+        <p>Solves for Pressure, Volume, Moles, or Temperature.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('gas')">Open Calculator →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-amber"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></div><span class="chip chip-amber">Essential</span></div>
+        <h3>Thermodynamics (ΔG = ΔH - TΔS)</h3>
+        <p>Evaluates Gibbs free energy, spontaneity, and equilibrium constant.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('thermo')">Open Calculator →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-emerald"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></div><span class="chip chip-emerald">Molecular</span></div>
+        <h3>Electron Configuration</h3>
+        <p>Ground state Aufbau orbital sequences and noble gas condensations.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('config')">Open Tool →</button></div>
+      </article>
+      <article class="tool-card" data-category="essentials">
+        <div class="tool-card-top"><div class="tool-icon-wrapper icon-amber"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg></div><span class="chip chip-amber">Essential</span></div>
+        <h3>Stoichiometry &amp; Limiting Reagent</h3>
+        <p>Calculates limiting reactants and theoretical yields.</p>
+        <div class="tool-card-footer"><button class="btn btn-primary btn-sm" onclick="openCalculatorModal('stoichiometry')">Open Calculator →</button></div>
+      </article>
+    </div>
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 ChemAI Laboratory. Free Interactive Chemistry Educational Suite.</div>
+        <div><a href="index.html" class="text-emerald">Return to Main Platform →</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Calculator Modal -->
+  <div class="modal-backdrop" id="calculatorModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="calcModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="calcModalTitle">Chemistry Calculator</h3>
+        <button type="button" class="modal-close-btn" onclick="closeCalculatorModal()" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="calcModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal-container search-modal-container">
+      <div class="search-input-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-emerald)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchPaletteInput" class="search-main-input" placeholder="Search any calculator, element or simulation..." autocomplete="off">
+        <button type="button" class="modal-close-btn" onclick="closeSearchPalette()"><kbd>ESC</kbd></button>
+      </div>
+      <ul class="search-results-list" id="searchResultsList"></ul>
+    </div>
+  </div>
+
+  
+  <script src="js/periodic-table-data.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/calculators.js"></script>
+  <script src="js/periodic-table.js"></script>
+  <script src="js/virtual-lab.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/notes-generator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+

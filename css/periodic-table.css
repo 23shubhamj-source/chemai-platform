@@ -1,0 +1,239 @@
+﻿/* ==========================================================================
+   ChemAI Platform - Interactive Periodic Table Styles (118 Elements)
+   ========================================================================== */
+
+.ptable-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-emerald);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), var(--border-glow);
+  padding: 1.75rem;
+  overflow-x: auto;
+  position: relative;
+}
+
+.ptable-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.ptable-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  min-width: 280px;
+}
+
+.ptable-search-wrapper input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-highlight);
+  font-size: 0.92rem;
+  width: 100%;
+}
+
+/* Category Legend Pills */
+.ptable-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.legend-pill {
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  opacity: 0.85;
+}
+
+.legend-pill:hover, .legend-pill.active {
+  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Category Colors */
+.cat-alkali-metal { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #fca5a5; }
+.cat-alkaline-earth { background: rgba(249, 115, 22, 0.2); border-color: #f97316; color: #fdba74; }
+.cat-transition-metal { background: rgba(234, 179, 8, 0.2); border-color: #eab308; color: #fde047; }
+.cat-post-transition { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; }
+.cat-metalloid { background: rgba(6, 182, 212, 0.2); border-color: #06b6d4; color: #67e8f9; }
+.cat-reactive-nonmetal { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #93c5fd; }
+.cat-halogen { background: rgba(99, 102, 241, 0.2); border-color: #6366f1; color: #a5b4fc; }
+.cat-noble-gas { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe; }
+.cat-lanthanide { background: rgba(236, 72, 153, 0.2); border-color: #ec4899; color: #f9a8d4; }
+.cat-actinide { background: rgba(244, 63, 94, 0.2); border-color: #f43f5e; color: #fda4af; }
+
+/* The Standard 18x7 Periodic Table Grid */
+.ptable-grid {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(58px, 1fr));
+  gap: 4px;
+  min-width: 1080px;
+}
+
+.element-cell {
+  aspect-ratio: 1 / 1.15;
+  background: rgba(17, 34, 64, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.element-cell:hover {
+  transform: scale(1.15);
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 14px currentColor;
+  border-color: currentColor;
+}
+
+.element-cell.dimmed {
+  opacity: 0.18;
+  filter: grayscale(80%);
+}
+
+.element-cell.highlighted {
+  transform: scale(1.12);
+  z-index: 9;
+  box-shadow: 0 0 16px var(--color-emerald);
+  border-color: var(--color-emerald);
+}
+
+.cell-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.cell-symbol {
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  text-align: center;
+  color: var(--text-highlight);
+  line-height: 1;
+}
+
+.cell-name {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Blank spacer cells */
+.ptable-spacer {
+  pointer-events: none;
+}
+
+/* Lanthanide & Actinide separated block below */
+.ptable-f-block {
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(18, minmax(58px, 1fr));
+  gap: 4px;
+  min-width: 1080px;
+}
+
+.f-block-label {
+  grid-column: span 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Element Detail Modal / Inspector Drawer */
+.element-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 640px) {
+  .element-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.element-hero-card {
+  background: var(--bg-deep);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.element-big-symbol {
+  font-size: 4rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+/* Electron Shell Circles */
+.bohr-model-canvas {
+  width: 160px;
+  height: 160px;
+  margin: 1rem 0;
+}
+
+.element-props-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.element-props-table td {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.88rem;
+}
+
+.element-props-table td:first-child {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.element-props-table td:last-child {
+  text-align: right;
+  font-family: var(--font-mono);
+  color: var(--text-highlight);
+  font-weight: 600;
+}

@@ -1,0 +1,136 @@
+﻿/* ==========================================================================
+   ChemAI Platform - 3D Molecular Visualization Styles
+   ========================================================================== */
+
+.molecule-viewer-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-emerald);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), var(--border-glow);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.mol-toolbar {
+  padding: 1rem 1.5rem;
+  background: rgba(10, 25, 47, 0.9);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mol-preset-select {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-highlight);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  min-width: 180px;
+}
+.mol-preset-select:focus {
+  border-color: var(--color-emerald);
+}
+
+.mol-mode-toggles {
+  display: flex;
+  align-items: center;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 3px;
+}
+
+.mol-mode-btn {
+  padding: 0.4rem 0.85rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mol-mode-btn.active {
+  background: var(--bg-surface-elevated);
+  color: var(--color-emerald);
+}
+
+.mol-canvas-container {
+  width: 100%;
+  height: 520px;
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, #112240 0%, #060d1a 100%);
+  cursor: grab;
+}
+
+.mol-canvas-container:active {
+  cursor: grabbing;
+}
+
+#mol3dCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Molecule HUD Overlay */
+.mol-hud-overlay {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  background: rgba(10, 25, 47, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  max-width: 280px;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.mol-hud-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-highlight);
+  margin-bottom: 0.25rem;
+}
+
+.mol-hud-formula {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--color-emerald);
+  margin-bottom: 0.5rem;
+}
+
+.mol-hud-stats {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mol-hud-controls-hint {
+  position: absolute;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  background: rgba(10, 25, 47, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  pointer-events: none;
+}

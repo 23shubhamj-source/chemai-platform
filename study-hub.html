@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Hub & Quiz Generator | ChemAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <div class="ambient-glow ambient-glow-1"></div>
+  
+  <header class="site-nav" role="banner">
+    <div class="container">
+      <div class="nav-container">
+        <a href="index.html" class="nav-brand" aria-label="ChemAI Home">
+          <div class="brand-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/>
+              <line x1="8.5" y1="2" x2="15.5" y2="2"/>
+            </svg>
+          </div>
+          <span>Chem<span class="brand-text-ai">AI</span></span>
+        </a>
+        <nav class="nav-links" id="siteNavLinks"><a href="index.html" class="nav-link ">Home</a><a href="index.html#ai-assistant" class="nav-link ">AI Assistant</a><a href="tools.html" class="nav-link ">Tools</a><a href="virtual-lab.html" class="nav-link ">Virtual Lab</a><a href="periodic-table.html" class="nav-link ">Periodic Table</a><a href="index.html#molecule-viewer" class="nav-link ">3D Molecules</a><a href="study-hub.html" class="nav-link active">Study Hub</a><a href="index.html#research" class="nav-link ">Research</a></nav>
+        <div class="nav-actions">
+          <button type="button" class="nav-search-btn" onclick="openSearchPalette()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <a href="virtual-lab.html" class="btn btn-primary btn-sm">Launch Lab</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
+    <div class="sec-head">
+      <span class="sec-eyebrow">Interactive Study &amp; Revision</span>
+      <h1 class="sec-title">Chemistry Study Hub</h1>
+      <p class="sec-subtitle">Sharpen your understanding with interactive quizzes and generate AI revision sheets.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+      <div class="glass-card">
+        <h3 style="font-size:1.3rem;margin-bottom:1rem;color:#fff;">Practice Quiz Session</h3>
+        <div id="quizSetupPanel">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+            <div class="calc-form-group">
+              <label class="calc-label">Topic</label>
+              <div class="calc-input-wrapper">
+                <select id="quizTopicSelect" class="calc-input">
+                  <option value="all">All Topics</option>
+                  <option value="bonding">Chemical Bonding</option>
+                  <option value="stoichiometry">Stoichiometry</option>
+                  <option value="acids">Acids &amp; Bases</option>
+                  <option value="thermodynamics">Thermodynamics</option>
+                </select>
+              </div>
+            </div>
+            <div class="calc-form-group">
+              <label class="calc-label">Difficulty</label>
+              <div class="calc-input-wrapper">
+                <select id="quizDiffSelect" class="calc-input">
+                  <option value="all">All Levels</option>
+                  <option value="easy">Foundations</option>
+                  <option value="medium">Standard AP/CBSE</option>
+                  <option value="hard">Advanced</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="startQuiz()" style="width:100%;">Start Quiz Session →</button>
+        </div>
+        <div id="quizActivePanel" style="display:none;">
+          <div style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.85rem;margin-bottom:0.75rem;">
+            <span id="quizQuestionCounter" class="mono text-emerald">Question 1</span>
+          </div>
+          <h4 id="quizQuestionText" style="color:#fff;font-size:1.05rem;margin-bottom:1rem;line-height:1.4;">Question loading...</h4>
+          <div id="quizOptionsContainer" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+          <div id="quizExplanationBox" style="display:none;background:var(--bg-deep);padding:0.75rem;border-left:3px solid var(--color-emerald);margin-bottom:1rem;font-size:0.88rem;"></div>
+          <div style="text-align:right;"><button id="quizNextBtn" class="btn btn-primary btn-sm" onclick="advanceQuizQuestion()" disabled>Next Question →</button></div>
+        </div>
+        <div id="quizResultPanel" style="display:none;text-align:center;padding:1rem;">
+          <h4 style="color:#fff;font-size:1.3rem;">Quiz Complete!</h4>
+          <div id="quizScoreDisplay" style="font-size:2rem;color:var(--color-emerald);font-weight:800;margin:0.5rem 0;">0 / 0</div>
+          <p id="quizFeedbackMessage" style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">Practice again to improve!</p>
+          <button class="btn btn-primary btn-sm" onclick="restartQuiz()">Practice Again</button>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h3 style="font-size:1.3rem;margin-bottom:1rem;color:#fff;">AI Study Notes Generator</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div class="calc-form-group">
+            <label class="calc-label">Topic</label>
+            <div class="calc-input-wrapper">
+              <select id="notesTopicSelect" class="calc-input">
+                <option value="bonding">Chemical Bonding &amp; VSEPR</option>
+                <option value="thermodynamics">Thermodynamics</option>
+                <option value="acids">Acids, Bases &amp; Buffers</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-form-group">
+            <label class="calc-label">Level</label>
+            <div class="calc-input-wrapper">
+              <select id="notesLevelSelect" class="calc-input">
+                <option value="AP Chemistry">AP / IB HL</option>
+                <option value="CBSE Classes 11-12">CBSE / State Boards</option>
+                <option value="Undergraduate Chemistry">College</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;">
+          <button class="btn btn-primary btn-sm" onclick="generateAINotes()" style="flex:1;">Generate Notes</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyNotesToClipboard()">Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="printNotes()">Print</button>
+        </div>
+        <div id="notesOutputContent" style="background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1rem;max-height:300px;overflow-y:auto;font-size:0.9rem;">
+          <p style="color:var(--text-dim);font-style:italic;">Click "Generate Notes" to create a study revision sheet.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 ChemAI Laboratory. Free Interactive Chemistry Educational Suite.</div>
+        <div><a href="index.html" class="text-emerald">Return to Main Platform →</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Calculator Modal -->
+  <div class="modal-backdrop" id="calculatorModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="calcModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="calcModalTitle">Chemistry Calculator</h3>
+        <button type="button" class="modal-close-btn" onclick="closeCalculatorModal()" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="calcModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal-container search-modal-container">
+      <div class="search-input-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-emerald)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchPaletteInput" class="search-main-input" placeholder="Search any calculator, element or simulation..." autocomplete="off">
+        <button type="button" class="modal-close-btn" onclick="closeSearchPalette()"><kbd>ESC</kbd></button>
+      </div>
+      <ul class="search-results-list" id="searchResultsList"></ul>
+    </div>
+  </div>
+
+  
+  <script src="js/periodic-table-data.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/calculators.js"></script>
+  <script src="js/periodic-table.js"></script>
+  <script src="js/virtual-lab.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/notes-generator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,1412 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>ChemAI | Free AI Chemistry Solver, Virtual Lab & Molecular Tools</title>
+  <meta name="description" content="Intelligent AI chemistry companion for balancing equations, exploring 3D molecules, performing virtual experiments, and understanding chemistry beyond the classroom.">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js for 3D Molecule Visualization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/virtual-lab.css">
+  <link rel="stylesheet" href="css/periodic-table.css">
+  <link rel="stylesheet" href="css/molecule-viewer.css">
+</head>
+<body>
+  <!-- Floating Atom & Bond Particle Background -->
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient Glow Gradients -->
+  <div class="ambient-glow ambient-glow-1"></div>
+  <div class="ambient-glow ambient-glow-2"></div>
+
+  <!-- Sticky Modern Navigation Bar -->
+  <header class="site-nav" role="banner">
+    <div class="container">
+      <div class="nav-container">
+        <a href="index.html" class="nav-brand" aria-label="ChemAI Home">
+          <div class="brand-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/>
+              <line x1="8.5" y1="2" x2="15.5" y2="2"/>
+              <path d="M14 9.3a6.5 6.5 0 0 0-4 0"/>
+            </svg>
+          </div>
+          <span>Chem<span class="brand-text-ai">AI</span></span>
+        </a>
+
+        <nav class="nav-links" id="siteNavLinks" aria-label="Main Navigation">
+          <a href="#hero" class="nav-link active">Home</a>
+          <a href="#ai-assistant" class="nav-link">AI Assistant</a>
+          <a href="#tools" class="nav-link">Chemistry Tools</a>
+          <a href="#virtual-lab" class="nav-link">Virtual Lab</a>
+          <a href="#periodic-table" class="nav-link">Periodic Table</a>
+          <a href="#molecule-viewer" class="nav-link">3D Molecules</a>
+          <a href="#study-tools" class="nav-link">Study Hub</a>
+          <a href="#research" class="nav-link">Research</a>
+          <a href="#faq" class="nav-link">About & FAQ</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button type="button" class="nav-search-btn" onclick="openSearchPalette()" aria-label="Search tools">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span>Search</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <a href="#virtual-lab" class="btn btn-primary btn-sm">Launch Lab</a>
+          <button type="button" class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrap -->
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero-sec" id="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-text-col">
+            <div class="hero-eyebrow-pill">
+              <span class="status-dot"></span>
+              <span>AI CHEMISTRY PLATFORM · VERSION 2.0</span>
+            </div>
+            <h1 class="hero-title">
+              ChemAI can <br>
+              <span id="heroTypingText" class="typing-accent"></span><span class="typing-cursor"></span>
+            </h1>
+            <p class="hero-subheadline">
+              Explore Chemistry. Understand Everything.
+            </p>
+            <p class="hero-lead">
+              Your intelligent chemistry companion for solving equations, exploring 3D molecules, performing virtual experiments, and understanding science beyond the classroom.
+            </p>
+            <div class="hero-actions">
+              <a href="#tools" class="btn btn-primary">
+                <span>Start Exploring</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <a href="#virtual-lab" class="btn btn-ghost">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg>
+                <span>Open Virtual Lab</span>
+              </a>
+            </div>
+            <div class="hero-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>100% Free interactive tools · Accurate IUPAC scientific logic · No sign-up required</span>
+            </div>
+          </div>
+
+          <!-- Hero Right Simulated Chemistry Live Preview Card -->
+          <div class="hero-preview-col">
+            <div class="hero-preview-card">
+              <div class="preview-card-header">
+                <div class="preview-header-left">
+                  <div class="preview-avatar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="19" y2="7"/><line x1="12" y1="15" x2="5" y2="17"/></svg>
+                  </div>
+                  <div class="preview-title">
+                    <h4>ChemAI Assistant Live</h4>
+                    <p><span class="status-dot"></span> Online &amp; Ready</p>
+                  </div>
+                </div>
+                <span class="chip chip-emerald">Real-time Solver</span>
+              </div>
+              <div class="preview-body">
+                <div class="preview-chat-msg msg-user">
+                  Balance the reaction of iron rusting: Fe + O₂ → ?
+                </div>
+                <div class="preview-chat-msg msg-ai">
+                  <p>Here is the step-by-step balanced redox synthesis:</p>
+                  <div class="chem-equation-box">
+                    4Fe (s) + 3O₂ (g) → 2Fe₂O₃ (s)
+                  </div>
+                  <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.4rem;">
+                    • Oxidation state: Fe⁰ → Fe⁺³ (loss of 3e⁻)<br>
+                    • Standard enthalpy: ΔH° = -1648 kJ/mol (Exothermic)
+                  </p>
+                </div>
+              </div>
+              <div class="preview-chips-row">
+                <button type="button" class="preview-chip-btn" onclick="openCalculatorModal('balancer')">Try Balancer →</button>
+                <button type="button" class="preview-chip-btn" onclick="openCalculatorModal('molarmass')">Molar Mass →</button>
+                <button type="button" class="preview-chip-btn" onclick="openCalculatorModal('ph')">pH Scale →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- AI Chemistry Assistant Section -->
+    <section class="sec-wrap chat-section" id="ai-assistant">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="19" y2="7"/><line x1="12" y1="15" x2="5" y2="17"/></svg>
+            <span>Conversational Scientific Intelligence</span>
+          </div>
+          <h2 class="sec-title">Interactive AI Chemistry Assistant</h2>
+          <p class="sec-subtitle">
+            Ask complex chemistry questions, balance reactions, analyze organic mechanisms, or simulate problem solutions with step-by-step mathematical reasoning.
+          </p>
+        </div>
+
+        <div class="chat-card">
+          <!-- Chat Header -->
+          <div class="chat-header">
+            <div class="chat-header-info">
+              <div class="chat-logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
+              </div>
+              <div>
+                <h3 style="font-size:1.1rem;color:#fff;">ChemAI Assistant</h3>
+                <p style="font-size:0.8rem;color:var(--color-emerald);display:flex;align-items:center;gap:0.4rem;">
+                  <span class="status-dot"></span> Powered by Chemistry Knowledge Engine
+                </p>
+              </div>
+            </div>
+            <div class="chat-header-actions">
+              <button type="button" id="chatTtsBtn" class="btn-icon" title="Listen to AI answer (Text-to-Speech)" aria-label="Listen to answer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </button>
+              <button type="button" id="chatClearBtn" class="btn-icon" title="Clear conversation history" aria-label="Clear chat">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Messages Area -->
+          <div class="chat-messages-area" id="chatMessagesArea" role="log" aria-live="polite">
+            <div class="chat-message bot">
+              <div class="chat-avatar">AI</div>
+              <div class="chat-bubble">
+                <p><strong>Hello! I am ChemAI, your dedicated chemistry learning and research companion.</strong></p>
+                <p>I can help you with:</p>
+                <ul>
+                  <li>Balancing chemical reactions and oxidation numbers</li>
+                  <li>Molecular geometry, bond angles, and VSEPR theory</li>
+                  <li>Molar mass, stoichiometry, and limiting reagents</li>
+                  <li>Acid-base equilibria, buffers, and pH derivations</li>
+                  <li>Organic synthesis, S<sub>N</sub>1 vs S<sub>N</sub>2 mechanisms, and retrosynthesis</li>
+                  <li>Electrochemistry, cell potentials, and thermodynamics</li>
+                </ul>
+                <p>Click any suggested prompt below or type your question to begin!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Prompt Chips -->
+          <div class="chat-prompt-chips">
+            <button type="button" class="prompt-pill" onclick="sendQuickPrompt('Balance this chemical equation')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+              Balance equation
+            </button>
+            <button type="button" class="prompt-pill" onclick="sendQuickPrompt('Explain chemical bonding')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/></svg>
+              Chemical bonding
+            </button>
+            <button type="button" class="prompt-pill" onclick="sendQuickPrompt('Calculate molar mass')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              Molar mass
+            </button>
+            <button type="button" class="prompt-pill" onclick="sendQuickPrompt('Solve a stoichiometry problem')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg>
+              Stoichiometry
+            </button>
+            <button type="button" class="prompt-pill" onclick="sendQuickPrompt('Explain electrochemistry')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Electrochemistry
+            </button>
+            <button type="button" class="prompt-pill" onclick="sendQuickPrompt('What is the difference between SN1 and SN2?')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/></svg>
+              SN1 vs SN2
+            </button>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <div class="chat-input-bar">
+            <form id="chatForm" class="chat-form">
+              <input type="text" id="chatUserInput" class="chat-input" placeholder="Ask any chemistry question or formula (e.g. 'What is the molar mass of H2SO4?' or 'Explain Gibbs free energy')..." autocomplete="off" required>
+              <div class="chat-btn-group">
+                <input type="file" id="chatImageUploadInput" accept="image/*" style="display:none;" onchange="handleImageSelected(event)">
+                <button type="button" class="btn-icon" title="Upload chemistry problem image / screenshot" onclick="triggerImageUpload()" aria-label="Upload question image">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm" aria-label="Send question">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  <span>Send</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chemistry Tools Dashboard -->
+    <section class="sec-wrap" id="tools">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Comprehensive Scientific Workspace</span>
+          </div>
+          <h2 class="sec-title">Chemistry Tools &amp; Calculators</h2>
+          <p class="sec-subtitle">
+            Every tool is equipped with real mathematical logic, formula derivations, input validation, and step-by-step scientific explanations.
+          </p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="tools-filter-bar">
+          <ul class="category-tabs" role="tablist">
+            <li><button type="button" class="category-tab active" data-category="all">All Tools (20+)</button></li>
+            <li><button type="button" class="category-tab" data-category="essentials">Student Essentials</button></li>
+            <li><button type="button" class="category-tab" data-category="molecular">Molecular Tools</button></li>
+            <li><button type="button" class="category-tab" data-category="advanced">Advanced Tools</button></li>
+            <li><button type="button" class="category-tab" data-category="study">Study Tools</button></li>
+          </ul>
+
+          <div class="tools-search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="toolsSearchInput" placeholder="Filter tools by name..." aria-label="Filter tools">
+          </div>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="tools-grid">
+          <!-- 1. Equation Balancer -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-emerald">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+                </div>
+                <span class="chip chip-emerald">Essential</span>
+              </div>
+              <h3>Chemical Equation Balancer</h3>
+              <p>Solve stoichiometric atom balances automatically with linear algebra. Handles synthesis, redox, and combustion.</p>
+              <div class="tool-card-sample">
+                <span>C₃H₈ + 5O₂ → 3CO₂ + 4H₂O</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Algebraic Solver</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('balancer')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 2. Molar Mass -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-cobalt">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <span class="chip chip-cobalt">Essential</span>
+              </div>
+              <h3>Molar Mass Calculator</h3>
+              <p>Computes exact molecular weights and elemental percentage mass compositions for any complex formula or hydrate.</p>
+              <div class="tool-card-sample">
+                <span>CuSO₄ · 5H₂O = 249.68 g/mol</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">IUPAC Weights</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('molarmass')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 3. Stoichiometry -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-amber">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <span class="chip chip-amber">Essential</span>
+              </div>
+              <h3>Stoichiometry &amp; Limiting Reagent</h3>
+              <p>Identify limiting vs excess reactants, theoretical yields, and mole ratios with multi-step conversions.</p>
+              <div class="tool-card-sample">
+                <span>2H₂ + O₂ → 2H₂O (1:1 Ratio)</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Mole Conversion</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('stoichiometry')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 4. pH & pOH -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-violet">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <span class="chip chip-violet">Essential</span>
+              </div>
+              <h3>pH and pOH Calculator</h3>
+              <p>Interconvert pH, pOH, [H⁺], and [OH⁻] concentrations with temperature adjustments and an interactive acid-base meter.</p>
+              <div class="tool-card-sample">
+                <span>[H⁺] = 10⁻⁷ M ↔ pH = 7.00</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Logarithmic Solver</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('ph')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 5. Dilution -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-emerald">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg>
+                </div>
+                <span class="chip chip-emerald">Essential</span>
+              </div>
+              <h3>Solution Dilution Calculator</h3>
+              <p>Calculate stock concentrations and required solvent volumes using M₁V₁ = M₂V₂ with unit conversions.</p>
+              <div class="tool-card-sample">
+                <span>M₁ · V₁ = M₂ · V₂</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Solution Prep</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('dilution')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 6. Gas Laws -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-cobalt">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+                </div>
+                <span class="chip chip-cobalt">Essential</span>
+              </div>
+              <h3>Ideal Gas Law Calculator</h3>
+              <p>Solve for Pressure, Volume, Moles, or Temperature with atmospheric, metric, and Kelvin unit transformations.</p>
+              <div class="tool-card-sample">
+                <span>PV = nRT (R = 0.08206)</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Kinetic Gas Law</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('gas')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 7. Thermodynamics -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-amber">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                </div>
+                <span class="chip chip-amber">Essential</span>
+              </div>
+              <h3>Thermodynamics Calculator</h3>
+              <p>Determine Gibbs free energy ΔG, reaction spontaneity, crossover equilibrium temperatures, and constant K.</p>
+              <div class="tool-card-sample">
+                <span>ΔG = ΔH - T·ΔS</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Spontaneity</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('thermo')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 8. Percentage Yield -->
+          <article class="tool-card" data-category="essentials">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-violet">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                </div>
+                <span class="chip chip-violet">Essential</span>
+              </div>
+              <h3>Percentage Yield Calculator</h3>
+              <p>Evaluate laboratory experimental efficiency by comparing actual recovered mass against theoretical stoichiometry.</p>
+              <div class="tool-card-sample">
+                <span>Yield = (Actual / Theo) × 100%</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Lab Prep</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('yield')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 9. Electron Configuration -->
+          <article class="tool-card" data-category="molecular">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-emerald">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="11"/></svg>
+                </div>
+                <span class="chip chip-emerald">Molecular</span>
+              </div>
+              <h3>Electron Configuration Tool</h3>
+              <p>Generates ground-state Aufbau orbital sequences, noble gas condensations, valence electron counts, and Hund rules.</p>
+              <div class="tool-card-sample">
+                <span>Fe: [Ar] 4s² 3d⁶ (Z=26)</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Aufbau Principle</span>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="openCalculatorModal('config')">Open Tool →</button>
+            </div>
+          </article>
+
+          <!-- 10. Periodic Table Showcase Card -->
+          <article class="tool-card" data-category="molecular">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-cobalt">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <span class="chip chip-cobalt">Molecular</span>
+              </div>
+              <h3>Interactive Periodic Table</h3>
+              <p>Explore all 118 IUPAC elements with atomic numbers, masses, electron configurations, and Bohr model orbital shells.</p>
+              <div class="tool-card-sample">
+                <span>118 Elements · Periods 1-7</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Full IUPAC</span>
+              <a href="#periodic-table" class="btn btn-ghost btn-sm">View Table →</a>
+            </div>
+          </article>
+
+          <!-- 11. 3D Molecule Viewer Card -->
+          <article class="tool-card" data-category="molecular">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-amber">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="19" y2="7"/><line x1="12" y1="15" x2="5" y2="17"/></svg>
+                </div>
+                <span class="chip chip-amber">Molecular</span>
+              </div>
+              <h3>3D Molecule Viewer</h3>
+              <p>WebGL 3D molecular renderer for Ball &amp; Stick and Space-Filling geometry with orbit rotation and CPK color coding.</p>
+              <div class="tool-card-sample">
+                <span>H₂O, CH₄, Caffeine, Aspirin</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Three.js WebGL</span>
+              <a href="#molecule-viewer" class="btn btn-ghost btn-sm">Launch 3D →</a>
+            </div>
+          </article>
+
+          <!-- 12. Virtual Chemistry Lab Card -->
+          <article class="tool-card" data-category="advanced">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-violet">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg>
+                </div>
+                <span class="chip chip-violet">Advanced</span>
+              </div>
+              <h3>Virtual Chemistry Lab</h3>
+              <p>Browser digital workbench with dynamic burette titration curves, universal indicator tests, and precipitation reactions.</p>
+              <div class="tool-card-sample">
+                <span>5 Educational Simulations</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Digital Lab</span>
+              <a href="#virtual-lab" class="btn btn-ghost btn-sm">Open Lab →</a>
+            </div>
+          </article>
+
+          <!-- 13. Chemistry Quiz Generator -->
+          <article class="tool-card" data-category="study">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-emerald">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <span class="chip chip-emerald">Study</span>
+              </div>
+              <h3>Chemistry Quiz Generator</h3>
+              <p>Practice custom chemistry tests across Stoichiometry, Bonding, Thermodynamics, and Organic with instant explanations.</p>
+              <div class="tool-card-sample">
+                <span>Interactive Multiple Choice</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Test Prep</span>
+              <a href="#study-tools" class="btn btn-ghost btn-sm">Take Quiz →</a>
+            </div>
+          </article>
+
+          <!-- 14. AI Notes Generator -->
+          <article class="tool-card" data-category="study">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-cobalt">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <span class="chip chip-cobalt">Study</span>
+              </div>
+              <h3>AI Notes Generator</h3>
+              <p>Produce structured high-yield revision summaries, key definitions, formulas, and exam tips with one-click print export.</p>
+              <div class="tool-card-sample">
+                <span>Revision Sheets</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Study Guide</span>
+              <a href="#study-tools" class="btn btn-ghost btn-sm">Create Notes →</a>
+            </div>
+          </article>
+
+          <!-- 15. Spectroscopy Explorer -->
+          <article class="tool-card" data-category="advanced">
+            <div>
+              <div class="tool-card-top">
+                <div class="tool-icon-wrapper icon-amber">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <span class="chip chip-amber">Advanced</span>
+              </div>
+              <h3>Spectroscopy Analyzer</h3>
+              <p>Explore infrared (FT-IR) stretching peaks (C=O, O-H, C-H) and NMR chemical shift regions for organic characterization.</p>
+              <div class="tool-card-sample">
+                <span>IR 1715 cm⁻¹ = Carbonyl C=O</span>
+              </div>
+            </div>
+            <div class="tool-card-footer">
+              <span class="text-dim mono" style="font-size:0.75rem;">Spectral Elucidation</span>
+              <a href="#research" class="btn btn-ghost btn-sm">Explore Spectra →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <!-- Virtual Chemistry Lab Section -->
+    <section class="sec-wrap" id="virtual-lab">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg>
+            <span>Browser-Based Digital Experimentation</span>
+          </div>
+          <h2 class="sec-title">Virtual Chemistry Laboratory</h2>
+          <p class="sec-subtitle">
+            Perform simulated laboratory procedures, control reagent additions, observe color transitions, and plot real-time titration curves without safety hazards.
+          </p>
+        </div>
+
+        <div class="vlab-dashboard">
+          <!-- Experiment Tabs -->
+          <div class="vlab-exp-bar" role="tablist">
+            <button type="button" class="vlab-exp-tab active" data-exp="titration" onclick="switchLabExperiment('titration')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg>
+              <span>Acid-Base Titration</span>
+            </button>
+            <button type="button" class="vlab-exp-tab" data-exp="indicator" onclick="switchLabExperiment('indicator')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Universal pH Indicator</span>
+            </button>
+            <button type="button" class="vlab-exp-tab" data-exp="precipitation" onclick="switchLabExperiment('precipitation')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4M17 20V8M3 20h18"/></svg>
+              <span>Precipitation Reactions</span>
+            </button>
+          </div>
+
+          <!-- Lab Workspace Grid -->
+          <div class="vlab-workspace-grid">
+            <!-- Left: Simulated Bench & Apparatus Stage -->
+            <div class="vlab-stage">
+              <!-- Titration Apparatus View -->
+              <div id="view_titration" class="vlab-exp-view" style="width:100%;height:100%;">
+                <div class="vlab-apparatus-center">
+                  <div class="titration-rig">
+                    <div class="lab-stand-base"></div>
+                    <div class="lab-stand-rod"></div>
+                    <div class="lab-clamp"></div>
+
+                    <!-- Burette -->
+                    <div class="glass-burette" title="50 mL Burette with 0.100 M NaOH">
+                      <div class="burette-liquid" id="buretteLiquid" style="height: 100%;"></div>
+                    </div>
+
+                    <!-- Valve -->
+                    <div class="burette-valve" onclick="toggleBuretteValve()" title="Click to open/close stopcock valve">
+                      <div class="valve-handle" id="valveHandle"></div>
+                    </div>
+
+                    <!-- Animated Droplet -->
+                    <div class="droplet-emitter" id="dropletEmitter"></div>
+
+                    <!-- Erlenmeyer Flask -->
+                    <div class="erlenmeyer-flask">
+                      <div class="flask-body">
+                        <div class="flask-solution" id="flaskSolution"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Universal Indicator View -->
+              <div id="view_indicator" class="vlab-exp-view" style="display:none;width:100%;height:100%;">
+                <div class="vlab-apparatus-center">
+                  <div class="test-tube-slot">
+                    <div class="test-tube-glass" style="width:48px;height:240px;border-radius:0 0 24px 24px;">
+                      <div class="test-tube-fluid" id="indicatorTubeFluid" style="height:70%;background:#10b981;"></div>
+                    </div>
+                    <div id="indicatorDesc" style="color:var(--text-main);font-size:0.9rem;margin-top:0.75rem;text-align:center;max-width:320px;">
+                      Neutral Pure Water: Emerald Green (pH 7.0)
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Precipitation View -->
+              <div id="view_precipitation" class="vlab-exp-view" style="display:none;width:100%;height:100%;">
+                <div class="vlab-apparatus-center">
+                  <div class="test-tube-slot">
+                    <div class="test-tube-glass" style="width:48px;height:240px;border-radius:0 0 24px 24px;">
+                      <div class="test-tube-fluid" id="precipitateTubeFluid" style="height:65%;background:rgba(255,255,255,0.9);box-shadow:0 0 16px rgba(255,255,255,0.6);"></div>
+                    </div>
+                    <div id="precipitateReactionLabel" style="color:var(--text-main);font-size:0.9rem;margin-top:0.75rem;text-align:center;max-width:360px;">
+                      <strong>AgNO₃ (aq) + NaCl (aq) → AgCl (s)↓ + NaNO₃ (aq)</strong><br>
+                      <span class="text-emerald">Net Ionic: Ag⁺ (aq) + Cl⁻ (aq) → AgCl (s)↓</span><br>
+                      <small>White curdy silver chloride precipitate formed.</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bench Table Top -->
+              <div class="vlab-bench-surface"></div>
+            </div>
+
+            <!-- Right: Sensor Readings, Graph, Controls & Observation Log -->
+            <div class="vlab-sidebar">
+              <div class="vlab-gauge-card">
+                <div class="gauge-header">
+                  <span>pH Sensor Reading</span>
+                  <span class="chip chip-emerald">Digital Probe</span>
+                </div>
+                <div class="gauge-readout" id="vlabPHReadout">1.00</div>
+                <div style="font-size:0.82rem;color:var(--text-muted);display:flex;justify-content:space-between;margin-top:0.25rem;">
+                  <span>0.100 M HCl in flask (25.0 mL)</span>
+                  <span id="vlabAddedVol" style="color:var(--color-cobalt);font-family:var(--font-mono);font-weight:700;">0.00 mL</span>
+                </div>
+              </div>
+
+              <!-- Live Titration Canvas Curve -->
+              <div class="vlab-gauge-card" style="padding:1rem;">
+                <div class="gauge-header" style="margin-bottom:0.5rem;">
+                  <span>Dynamic Titration Curve (pH vs Vol)</span>
+                  <span class="mono" style="font-size:0.75rem;color:var(--color-emerald);">V_eq = 25.0 mL</span>
+                </div>
+                <canvas id="titrationCurveCanvas"></canvas>
+              </div>
+
+              <!-- Interactive Controls Group -->
+              <div class="vlab-controls-group">
+                <div class="vlab-action-buttons">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="toggleBuretteValve()" style="flex:1;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Toggle Valve</span>
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="dispenseSingleDrop()" title="Add precisely 0.1 mL">
+                    +0.1 mL Drop
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="resetTitration()" title="Reset burette and flask">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                  </button>
+                </div>
+
+                <!-- Indicator Reagent Quick Buttons (When in indicator mode) -->
+                <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('hcl')">1M HCl</button>
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('lemon')">Lemon</button>
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('vinegar')">Vinegar</button>
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('water')">Water</button>
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('bakingSoda')">Baking Soda</button>
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('ammonia')">Ammonia</button>
+                  <button type="button" class="chip chip-emerald" onclick="testIndicatorSubstance('bleach')">Bleach</button>
+                </div>
+
+                <!-- Precipitation Quick Reagent Buttons -->
+                <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
+                  <button type="button" class="chip chip-cobalt" onclick="mixPrecipitation('AgNO3_NaCl')">AgNO₃ + NaCl (AgCl↓)</button>
+                  <button type="button" class="chip chip-amber" onclick="mixPrecipitation('PbNO3_KI')">Pb(NO₃)₂ + KI (PbI₂↓)</button>
+                  <button type="button" class="chip chip-violet" onclick="mixPrecipitation('CuSO4_NaOH')">CuSO₄ + NaOH (Cu(OH)₂↓)</button>
+                </div>
+              </div>
+
+              <!-- Lab Observation Log -->
+              <div>
+                <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;color:var(--text-highlight);">Laboratory Observation Log:</div>
+                <div class="vlab-observation-log" id="vlabLog">
+                  <div class="log-entry"><span class="log-timestamp">[Ready]</span> Digital laboratory calibrated. Titrant: 0.100 M NaOH. Analyte: 25.0 mL 0.100 M HCl.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Periodic Table Section -->
+    <section class="sec-wrap" id="periodic-table">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span>Standard IUPAC Layout</span>
+          </div>
+          <h2 class="sec-title">Interactive Periodic Table of Elements</h2>
+          <p class="sec-subtitle">
+            All 118 chemical elements with atomic weights, electron configurations, electronegativity, category color filters, and dynamic Bohr atomic orbital models.
+          </p>
+        </div>
+
+        <div class="ptable-container">
+          <!-- Table Toolbar -->
+          <div class="ptable-toolbar">
+            <div class="ptable-search-wrapper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="ptableSearchInput" placeholder="Search element by name, symbol, or atomic number (e.g. 'Au', 'Iron', '26')..." aria-label="Search elements">
+            </div>
+
+            <!-- Category Legend -->
+            <div class="ptable-legend">
+              <button type="button" class="legend-pill active" data-cat="all">All Elements</button>
+              <button type="button" class="legend-pill cat-alkali-metal" data-cat="alkali-metal">Alkali Metals</button>
+              <button type="button" class="legend-pill cat-alkaline-earth" data-cat="alkaline-earth">Alkaline Earth</button>
+              <button type="button" class="legend-pill cat-transition-metal" data-cat="transition-metal">Transition Metals</button>
+              <button type="button" class="legend-pill cat-post-transition" data-cat="post-transition">Post-Transition</button>
+              <button type="button" class="legend-pill cat-metalloid" data-cat="metalloid">Metalloids</button>
+              <button type="button" class="legend-pill cat-reactive-nonmetal" data-cat="reactive-nonmetal">Reactive Nonmetals</button>
+              <button type="button" class="legend-pill cat-halogen" data-cat="halogen">Halogens</button>
+              <button type="button" class="legend-pill cat-noble-gas" data-cat="noble-gas">Noble Gases</button>
+              <button type="button" class="legend-pill cat-lanthanide" data-cat="lanthanide">Lanthanides</button>
+              <button type="button" class="legend-pill cat-actinide" data-cat="actinide">Actinides</button>
+            </div>
+          </div>
+
+          <!-- Main 18x7 IUPAC Grid -->
+          <div class="ptable-grid" id="ptableGrid"></div>
+
+          <!-- Detached f-block rows for Lanthanides and Actinides -->
+          <div class="ptable-f-block" id="ptableFBlock"></div>
+        </div>
+      </div>
+    </section>
+    <!-- 3D Molecule Viewer Section -->
+    <section class="sec-wrap" id="molecule-viewer">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="19" y2="7"/><line x1="12" y1="15" x2="5" y2="17"/></svg>
+            <span>WebGL Molecular Geometry</span>
+          </div>
+          <h2 class="sec-title">3D Molecular Structure Visualizer</h2>
+          <p class="sec-subtitle">
+            Inspect spatial bonding conformations, bond lengths, and CPK standard atom coloring with full 360-degree rotation and zoom.
+          </p>
+        </div>
+
+        <div class="molecule-viewer-wrapper">
+          <!-- Toolbar -->
+          <div class="mol-toolbar">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <label for="molPresetSelect" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;">Choose Molecule:</label>
+              <select id="molPresetSelect" class="mol-preset-select" onchange="setMoleculePreset(this.value)">
+                <option value="water">Water (H₂O)</option>
+                <option value="methane">Methane (CH₄)</option>
+                <option value="co2">Carbon Dioxide (CO₂)</option>
+                <option value="ethanol">Ethanol (C₂H₅OH)</option>
+                <option value="benzene">Benzene (C₆H₆)</option>
+                <option value="caffeine">Caffeine (C₈H₁₀N₄O₂)</option>
+                <option value="aspirin">Aspirin (C₉H₈O₄)</option>
+              </select>
+            </div>
+
+            <div class="mol-mode-toggles">
+              <button type="button" class="mol-mode-btn active" data-mode="ballStick" onclick="setMolDisplayMode('ballStick')">Ball &amp; Stick</button>
+              <button type="button" class="mol-mode-btn" data-mode="spaceFill" onclick="setMolDisplayMode('spaceFill')">Space Filling</button>
+              <button type="button" class="mol-mode-btn" data-mode="wireframe" onclick="setMolDisplayMode('wireframe')">Wireframe</button>
+            </div>
+
+            <div style="display:flex;gap:0.5rem;">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="toggleMolAutoRotate()" title="Toggle auto rotation">
+                Auto-Spin ⟳
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="resetMolCamera()" title="Reset view orientation">
+                Reset View
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D Canvas Viewport -->
+          <div class="mol-canvas-container" id="molCanvasContainer">
+            <!-- HUD Overlay -->
+            <div class="mol-hud-overlay">
+              <div class="mol-hud-title" id="molHudTitle">Water</div>
+              <div class="mol-hud-formula" id="molHudFormula">H₂O</div>
+              <div class="mol-hud-stats">
+                <span id="molHudMw">Molar Mass: 18.015 g/mol</span>
+                <span id="molHudAtoms">Atoms: 3 · Bonds: 2</span>
+              </div>
+              <p id="molHudDesc" style="font-size:0.78rem;color:var(--text-dim);margin-top:0.4rem;line-height:1.4;">
+                Universal polar solvent with high hydrogen bonding capacity.
+              </p>
+            </div>
+
+            <div class="mol-hud-controls-hint">
+              <span>Drag mouse to rotate · Scroll to zoom</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Study Tools & Learning Hub Section -->
+    <section class="sec-wrap" id="study-tools">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>Accelerated Scientific Learning</span>
+          </div>
+          <h2 class="sec-title">Chemistry Study Hub &amp; Exam Prep</h2>
+          <p class="sec-subtitle">
+            Generate custom practice quizzes with instant rationales and generate high-yield AI revision study notes for your curriculum.
+          </p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+          <!-- Left: Chemistry Quiz Generator -->
+          <div class="glass-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+              <h3 style="font-size:1.3rem;display:flex;align-items:center;gap:0.5rem;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Chemistry Quiz Generator
+              </h3>
+              <span class="chip chip-emerald">Interactive Test</span>
+            </div>
+
+            <!-- Quiz Setup Panel -->
+            <div id="quizSetupPanel">
+              <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">
+                Test your chemistry understanding with instant feedback, equation verification, and conceptual explanations.
+              </p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+                <div class="calc-form-group">
+                  <label class="calc-label">Topic</label>
+                  <div class="calc-input-wrapper">
+                    <select id="quizTopicSelect" class="calc-input" style="cursor:pointer;">
+                      <option value="all">All Topics (Comprehensive)</option>
+                      <option value="bonding">Chemical Bonding &amp; VSEPR</option>
+                      <option value="stoichiometry">Stoichiometry &amp; Moles</option>
+                      <option value="acids">Acids, Bases &amp; pH</option>
+                      <option value="thermodynamics">Thermodynamics &amp; ΔG</option>
+                      <option value="organic">Organic Chemistry Mechanisms</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="calc-form-group">
+                  <label class="calc-label">Difficulty</label>
+                  <div class="calc-input-wrapper">
+                    <select id="quizDiffSelect" class="calc-input" style="cursor:pointer;">
+                      <option value="all">Mixed Levels</option>
+                      <option value="easy">High School / Foundations</option>
+                      <option value="medium">AP / IB / CBSE (Standard)</option>
+                      <option value="hard">College / Advanced Honors</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="startQuiz()" style="width:100%;">
+                Start Quiz Session →
+              </button>
+            </div>
+
+            <!-- Quiz Active Question Panel -->
+            <div id="quizActivePanel" style="display:none;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;color:var(--text-muted);font-size:0.85rem;">
+                <span id="quizQuestionCounter" class="mono text-emerald">Question 1 of 5</span>
+                <span class="chip chip-cobalt">Instant Rationale</span>
+              </div>
+              <h4 id="quizQuestionText" style="font-size:1.1rem;color:#fff;margin-bottom:1.25rem;line-height:1.4;">
+                Question text loading...
+              </h4>
+              <div id="quizOptionsContainer" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem;">
+                <!-- Options injected dynamically -->
+              </div>
+              <div id="quizExplanationBox" style="display:none;background:var(--bg-deep);border-left:3px solid var(--color-emerald);padding:0.9rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:0.88rem;color:var(--text-main);margin-bottom:1.25rem;line-height:1.5;"></div>
+              <div style="display:flex;justify-content:flex-end;">
+                <button type="button" id="quizNextBtn" class="btn btn-primary btn-sm" onclick="advanceQuizQuestion()" disabled>
+                  Next Question →
+                </button>
+              </div>
+            </div>
+
+            <!-- Quiz Result Summary Panel -->
+            <div id="quizResultPanel" style="display:none;text-align:center;padding:1.5rem 0;">
+              <div style="width:64px;height:64px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid var(--color-emerald);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem auto;color:var(--color-emerald);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h4 style="font-size:1.4rem;color:#fff;">Quiz Completed!</h4>
+              <div id="quizScoreDisplay" style="font-size:2rem;font-weight:900;color:var(--color-emerald);font-family:var(--font-mono);margin:0.5rem 0;">
+                0 / 0
+              </div>
+              <p id="quizFeedbackMessage" style="color:var(--text-muted);font-size:0.92rem;max-width:380px;margin:0 auto 1.5rem auto;">
+                Great work reviewing core chemical principles!
+              </p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="restartQuiz()">Practice Again</button>
+            </div>
+          </div>
+
+          <!-- Right: AI Notes Generator -->
+          <div class="glass-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+              <h3 style="font-size:1.3rem;display:flex;align-items:center;gap:0.5rem;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                AI Chemistry Notes Generator
+              </h3>
+              <span class="chip chip-cobalt">Revision Sheet</span>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">
+              Generate high-yield revision summaries with definitions, formulas, reaction mechanisms, and exam reminders.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+              <div class="calc-form-group">
+                <label class="calc-label">Chemistry Topic</label>
+                <div class="calc-input-wrapper">
+                  <select id="notesTopicSelect" class="calc-input" style="cursor:pointer;">
+                    <option value="bonding">Chemical Bonding &amp; VSEPR</option>
+                    <option value="thermodynamics">Thermodynamics &amp; Free Energy</option>
+                    <option value="acids">Acids, Bases &amp; Buffer Solutions</option>
+                  </select>
+                </div>
+              </div>
+              <div class="calc-form-group">
+                <label class="calc-label">Target Standard</label>
+                <div class="calc-input-wrapper">
+                  <select id="notesLevelSelect" class="calc-input" style="cursor:pointer;">
+                    <option value="AP Chemistry">AP Chemistry / IB HL</option>
+                    <option value="CBSE Classes 11-12">CBSE / State Boards (India)</option>
+                    <option value="Undergraduate Chemistry">College / Undergraduate</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;">
+              <button type="button" class="btn btn-primary" onclick="generateAINotes()" style="flex:1;">Generate Notes</button>
+              <button type="button" class="btn btn-ghost" onclick="copyNotesToClipboard()" title="Copy formatted text">Copy Text</button>
+              <button type="button" class="btn btn-ghost" onclick="printNotes()" title="Print / Save PDF">Print</button>
+            </div>
+            <!-- Output Sheet -->
+            <div id="notesOutputContent" style="background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.5rem;max-height:280px;overflow-y:auto;">
+              <p style="color:var(--text-dim);font-style:italic;">Click "Generate Notes" above to construct a customized study sheet for your curriculum.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Research Hub & Spectroscopy Section -->
+    <section class="sec-wrap" id="research">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Advanced Chemical Investigation</span>
+          </div>
+          <h2 class="sec-title">Spectroscopy &amp; Research Hub</h2>
+          <p class="sec-subtitle">
+            Elucidate unknown chemical structures using characteristic infrared (FT-IR) absorbance peaks, proton NMR chemical shift windows, and chemical safety protocols.
+          </p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:2rem;">
+          <!-- Left: Interactive Spectroscopy Peak Finder -->
+          <div class="glass-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+              <h3 style="font-size:1.2rem;color:#fff;">Infrared (FT-IR) Functional Group Identifier</h3>
+              <span class="chip chip-amber">Spectral Analysis</span>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.25rem;">
+              Diagnostic wavenumber (cm⁻¹) regions used by synthetic organic chemists to confirm functional group transformations:
+            </p>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.9rem;background:var(--bg-deep);border-radius:var(--radius-sm);border-left:3px solid var(--color-emerald);">
+                <span><strong>Carbonyl C=O Stretch:</strong> 1715 – 1740 cm⁻¹</span>
+                <span class="chip chip-emerald" style="font-size:0.7rem;">Ketones, Esters, Acids</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.9rem;background:var(--bg-deep);border-radius:var(--radius-sm);border-left:3px solid var(--color-cobalt);">
+                <span><strong>Hydroxyl O-H Stretch (Broad):</strong> 3200 – 3600 cm⁻¹</span>
+                <span class="chip chip-cobalt" style="font-size:0.7rem;">Alcohols &amp; Phenols</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.9rem;background:var(--bg-deep);border-radius:var(--radius-sm);border-left:3px solid var(--color-amber);">
+                <span><strong>Amine N-H Stretch:</strong> 3300 – 3500 cm⁻¹</span>
+                <span class="chip chip-amber" style="font-size:0.7rem;">Primary &amp; Sec Amines</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.9rem;background:var(--bg-deep);border-radius:var(--radius-sm);border-left:3px solid var(--color-violet);">
+                <span><strong>Alkyne C≡C / Nitrile C≡N:</strong> 2100 – 2260 cm⁻¹</span>
+                <span class="chip chip-violet" style="font-size:0.7rem;">Triple Bonds</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Laboratory Safety & Hazards -->
+          <div class="glass-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+              <h3 style="font-size:1.2rem;color:#fff;">Chemical Safety &amp; GHS Protocols</h3>
+              <span class="chip chip-rose">Safety Standards</span>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.25rem;">
+              Standard GHS hazard pictograms and risk mitigations for laboratory reagents:
+            </p>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:0.75rem;font-size:0.88rem;color:var(--text-main);">
+              <li style="display:flex;align-items:center;gap:0.75rem;">
+                <span style="color:#ef4444;font-weight:700;">⚠ Flammable (H225):</span>
+                <span>Store solvents (ether, acetone, ethanol) in certified fire safety cabinets.</span>
+              </li>
+              <li style="display:flex;align-items:center;gap:0.75rem;">
+                <span style="color:#f97316;font-weight:700;">☠ Corrosive (H314):</span>
+                <span>Concentrated acids (HCl, H₂SO₄) require chemical fume hood and nitrile gloves.</span>
+              </li>
+              <li style="display:flex;align-items:center;gap:0.75rem;">
+                <span style="color:#eab308;font-weight:700;">⚡ Oxidizer (H272):</span>
+                <span>Keep permanganates and nitrates strictly isolated from organic reducing agents.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Curriculum Alignment by Country -->
+    <section class="sec-wrap" style="background:rgba(6,13,26,0.5);">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            <span>Global Academic Support</span>
+          </div>
+          <h2 class="sec-title">Tailored for Chemistry Curricula Worldwide</h2>
+          <p class="sec-subtitle">
+            Whether preparing for competitive entrance examinations or university practicals, ChemAI provides exact curriculum alignment.
+          </p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem;">
+          <div class="glass-card">
+            <span class="chip chip-emerald" style="margin-bottom:0.75rem;">India</span>
+            <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">CBSE, ICSE &amp; JEE / NEET</h3>
+            <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.5;">
+              Classes 9-12 NCERT chemistry practicals, titration calculations, molarity conversions, and physical chemistry numericals.
+            </p>
+          </div>
+          <div class="glass-card">
+            <span class="chip chip-cobalt" style="margin-bottom:0.75rem;">United States</span>
+            <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">NGSS &amp; AP / IB Chemistry</h3>
+            <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.5;">
+              Advanced Placement free response practice, molecular kinetics, thermodynamics derivations, and VSEPR orbital geometries.
+            </p>
+          </div>
+          <div class="glass-card">
+            <span class="chip chip-violet" style="margin-bottom:0.75rem;">UK &amp; Commonwealth</span>
+            <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">GCSE, A-Levels &amp; Cambridge</h3>
+            <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.5;">
+              Paper 3 / Paper 5 practical exam preparation, quantitative analytical chemistry, and spectroscopic organic analysis.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Platform Stats -->
+    <section class="sec-wrap">
+      <div class="container">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.5rem;text-align:center;">
+          <div class="glass-card" style="padding:2rem;">
+            <div style="font-size:2.8rem;font-weight:900;color:var(--color-emerald);font-family:var(--font-mono);">50,000+</div>
+            <div style="font-size:0.95rem;color:var(--text-muted);margin-top:0.25rem;">Active Monthly Learners</div>
+          </div>
+          <div class="glass-card" style="padding:2rem;">
+            <div style="font-size:2.8rem;font-weight:900;color:var(--color-cobalt);font-family:var(--font-mono);">500M+</div>
+            <div style="font-size:0.95rem;color:var(--text-muted);margin-top:0.25rem;">Equations Solved &amp; Analyzed</div>
+          </div>
+          <div class="glass-card" style="padding:2rem;">
+            <div style="font-size:2.8rem;font-weight:900;color:var(--color-amber);font-family:var(--font-mono);">118</div>
+            <div style="font-size:0.95rem;color:var(--text-muted);margin-top:0.25rem;">Elements with Quantum Data</div>
+          </div>
+          <div class="glass-card" style="padding:2rem;">
+            <div style="font-size:2.8rem;font-weight:900;color:var(--color-violet);font-family:var(--font-mono);">99.4%</div>
+            <div style="font-size:0.95rem;color:var(--text-muted);margin-top:0.25rem;">Calculation Accuracy Rate</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="sec-wrap" style="background:rgba(6,13,26,0.6);">
+      <div class="container">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Community Feedback</span>
+          </div>
+          <h2 class="sec-title">Trusted by Chemistry Students &amp; Educators</h2>
+          <p class="sec-subtitle">
+            Read what educators, researchers, and students say about studying with ChemAI.
+          </p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:1.5rem;">
+          <div class="glass-card">
+            <p style="font-size:0.95rem;color:var(--text-main);line-height:1.6;margin-bottom:1.25rem;">
+              "The virtual titration lab with its real-time pH curve transformed how my students understand equivalence points. They no longer treat titration as random drops."
+            </p>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(16,185,129,0.2);color:var(--color-emerald);display:flex;align-items:center;justify-content:center;font-weight:700;">Dr</div>
+              <div>
+                <strong style="color:#fff;font-size:0.95rem;">Dr. Arvind Sharma</strong>
+                <div style="font-size:0.78rem;color:var(--text-muted);">Professor of Physical Chemistry · Delhi, India</div>
+              </div>
+            </div>
+          </div>
+          <div class="glass-card">
+            <p style="font-size:0.95rem;color:var(--text-main);line-height:1.6;margin-bottom:1.25rem;">
+              "ChemAI's chemical equation balancer and stoichiometry tool saved me hours during AP Chemistry homework. The step-by-step mole conversions make the logic click."
+            </p>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,0.2);color:var(--color-cobalt);display:flex;align-items:center;justify-content:center;font-weight:700;">EM</div>
+              <div>
+                <strong style="color:#fff;font-size:0.95rem;">Elena Miller</strong>
+                <div style="font-size:0.78rem;color:var(--text-muted);">AP Chemistry Student · California, USA</div>
+              </div>
+            </div>
+          </div>
+          <div class="glass-card">
+            <p style="font-size:0.95rem;color:var(--text-main);line-height:1.6;margin-bottom:1.25rem;">
+              "The 3D molecule viewer and spectroscopy reference are indispensable when evaluating organic synthesis pathways and stereochemical inversions."
+            </p>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(139,92,246,0.2);color:var(--color-violet);display:flex;align-items:center;justify-content:center;font-weight:700;">JT</div>
+              <div>
+                <strong style="color:#fff;font-size:0.95rem;">James Thornton</strong>
+                <div style="font-size:0.78rem;color:var(--text-muted);">Biochemistry Researcher · Oxford, UK</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="sec-wrap" id="faq">
+      <div class="container" style="max-width:840px;">
+        <div class="sec-head">
+          <div class="sec-eyebrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Common Questions</span>
+          </div>
+          <h2 class="sec-title">Frequently Asked Questions</h2>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <details class="glass-card" open style="padding:1.25rem 1.5rem;cursor:pointer;">
+            <summary style="font-weight:700;color:#fff;font-size:1.05rem;outline:none;">What is the ChemAI Platform?</summary>
+            <p style="color:var(--text-muted);font-size:0.92rem;line-height:1.6;margin-top:0.75rem;">
+              ChemAI is a comprehensive, free AI-powered chemistry learning and research suite combining automated chemical equation balancing, molar mass analysis, virtual laboratory experiments, interactive 3D molecular modeling, and exam preparation tools.
+            </p>
+          </details>
+          <details class="glass-card" style="padding:1.25rem 1.5rem;cursor:pointer;">
+            <summary style="font-weight:700;color:#fff;font-size:1.05rem;outline:none;">Are the chemistry calculators mathematically accurate?</summary>
+            <p style="color:var(--text-muted);font-size:0.92rem;line-height:1.6;margin-top:0.75rem;">
+              Yes! Every calculator uses true scientific algorithms: IUPAC standard atomic weights, conservation of mass linear algebra for equation balancing, logarithmic dissociation expressions for pH/pOH, and thermodynamic equilibrium formulations.
+            </p>
+          </details>
+          <details class="glass-card" style="padding:1.25rem 1.5rem;cursor:pointer;">
+            <summary style="font-weight:700;color:#fff;font-size:1.05rem;outline:none;">Can I use ChemAI on mobile devices?</summary>
+            <p style="color:var(--text-muted);font-size:0.92rem;line-height:1.6;margin-top:0.75rem;">
+              Yes, ChemAI is completely responsive and optimized for smartphones, tablets, laptops, and desktop screens with touch-friendly sliders and controls.
+            </p>
+          </details>
+          <details class="glass-card" style="padding:1.25rem 1.5rem;cursor:pointer;">
+            <summary style="font-weight:700;color:#fff;font-size:1.05rem;outline:none;">Does the Virtual Lab require any software installation?</summary>
+            <p style="color:var(--text-muted);font-size:0.92rem;line-height:1.6;margin-top:0.75rem;">
+              No. All experiments run directly inside modern web browsers using native HTML5 Canvas, SVG vectors, and WebGL without plugins or downloads.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <section class="sec-wrap" style="text-align:center;">
+      <div class="container" style="max-width:760px;">
+        <div class="glass-card" style="padding:3.5rem 2rem;border-color:var(--color-emerald);box-shadow:0 0 32px rgba(16,185,129,0.25);">
+          <span class="chip chip-emerald" style="margin-bottom:1rem;">Ready to Master Chemistry?</span>
+          <h2 style="font-size:2.4rem;color:#fff;margin-bottom:1rem;">Start Exploring Science Today</h2>
+          <p style="color:var(--text-muted);font-size:1.05rem;margin-bottom:2rem;line-height:1.6;">
+            Access free calculators, virtual titrations, 3D molecule visualizations, and AI-guided study tools with zero barriers.
+          </p>
+          <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;">
+            <a href="#ai-assistant" class="btn btn-primary">Launch AI Assistant</a>
+            <a href="#tools" class="btn btn-ghost">Explore All Tools</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-brand" style="margin-bottom:1rem;">
+            <div class="brand-icon-box">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/></svg>
+            </div>
+            <span>Chem<span class="brand-text-ai">AI</span></span>
+          </a>
+          <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;max-width:320px;">
+            The modern AI chemistry platform for students, teachers, and scientific researchers worldwide. Designed with premium scientific aesthetics.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Calculators</h4>
+          <ul>
+            <li><a href="javascript:void(0)" onclick="openCalculatorModal('balancer')">Equation Balancer</a></li>
+            <li><a href="javascript:void(0)" onclick="openCalculatorModal('molarmass')">Molar Mass</a></li>
+            <li><a href="javascript:void(0)" onclick="openCalculatorModal('stoichiometry')">Stoichiometry</a></li>
+            <li><a href="javascript:void(0)" onclick="openCalculatorModal('ph')">pH and pOH</a></li>
+            <li><a href="javascript:void(0)" onclick="openCalculatorModal('dilution')">Solution Dilution</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Interactive Labs</h4>
+          <ul>
+            <li><a href="#virtual-lab">Virtual Laboratory</a></li>
+            <li><a href="#periodic-table">118 Periodic Table</a></li>
+            <li><a href="#molecule-viewer">3D Molecular Viewer</a></li>
+            <li><a href="#study-tools">Chemistry Quiz Practice</a></li>
+            <li><a href="#research">Spectroscopy &amp; Safety</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Curricula</h4>
+          <ul>
+            <li><a href="#tools">CBSE Classes 9-12</a></li>
+            <li><a href="#tools">AP / IB Chemistry</a></li>
+            <li><a href="#tools">IGCSE &amp; AS/A Levels</a></li>
+            <li><a href="#faq">FAQ &amp; Help</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 ChemAI Laboratory. All rights reserved. Free Educational Chemistry Platform.</div>
+        <div style="display:flex;gap:1.5rem;">
+          <a href="#hero" class="text-emerald">Back to Top ↑</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Calculator Modal -->
+  <div class="modal-backdrop" id="calculatorModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="calcModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="calcModalTitle">Chemistry Calculator</h3>
+        <button type="button" class="modal-close-btn" onclick="closeCalculatorModal()" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="calcModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Element Detail Inspector Modal -->
+  <div class="modal-backdrop" id="elementModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalElementName">
+    <div class="modal-container" style="max-width:720px;">
+      <div class="modal-header">
+        <h3 id="modalElementName">Element Inspector</h3>
+        <button type="button" class="modal-close-btn" id="closeElementModalBtn" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="element-modal-grid">
+          <div class="element-hero-card">
+            <span class="chip chip-emerald" id="modalElementCat" style="margin-bottom:0.75rem;">Category</span>
+            <div class="element-big-symbol" id="modalElementSymbol">H</div>
+            <div style="font-size:1.1rem;font-weight:700;color:#fff;" id="modalElementMass">1.008 u</div>
+            <canvas id="bohrModelCanvas" class="bohr-model-canvas"></canvas>
+            <div style="font-size:0.75rem;color:var(--text-dim);">Bohr Atomic Electron Shells</div>
+          </div>
+          <div>
+            <table class="element-props-table">
+              <tr><td>Standard State:</td><td id="modalElementState">Gas</td></tr>
+              <tr><td>Electron Config:</td><td id="modalElementConfig">1s¹</td></tr>
+              <tr><td>Pauling Electronegativity:</td><td id="modalElementEN">2.20</td></tr>
+              <tr><td>Primary Applications:</td><td id="modalElementUses" style="font-size:0.8rem;line-height:1.4;">Rocket fuel, clean energy</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Command Palette Search Modal (Ctrl+K) -->
+  <div class="modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true" aria-label="Quick Search">
+    <div class="modal-container search-modal-container">
+      <div class="search-input-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-emerald)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchPaletteInput" class="search-main-input" placeholder="Type a tool name or chemistry concept (e.g. 'pH', 'molar', 'titration')..." autocomplete="off">
+        <button type="button" class="modal-close-btn" onclick="closeSearchPalette()">
+          <kbd style="font-family:var(--font-mono);font-size:0.75rem;padding:2px 6px;background:var(--bg-surface-elevated);border-radius:4px;border:1px solid var(--border-subtle);">ESC</kbd>
+        </button>
+      </div>
+      <ul class="search-results-list" id="searchResultsList"></ul>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/periodic-table-data.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/calculators.js"></script>
+  <script src="js/periodic-table.js"></script>
+  <script src="js/virtual-lab.js"></script>
+  <script src="js/molecule-viewer.js"></script>
+  <script src="js/ai-assistant.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/notes-generator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

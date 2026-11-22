@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Chemistry Lab | ChemAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/virtual-lab.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <div class="ambient-glow ambient-glow-1"></div>
+  
+  <header class="site-nav" role="banner">
+    <div class="container">
+      <div class="nav-container">
+        <a href="index.html" class="nav-brand" aria-label="ChemAI Home">
+          <div class="brand-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M10 2v7.31L4.62 18.27A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.73-2.73L14 9.31V2"/>
+              <line x1="8.5" y1="2" x2="15.5" y2="2"/>
+            </svg>
+          </div>
+          <span>Chem<span class="brand-text-ai">AI</span></span>
+        </a>
+        <nav class="nav-links" id="siteNavLinks"><a href="index.html" class="nav-link ">Home</a><a href="index.html#ai-assistant" class="nav-link ">AI Assistant</a><a href="tools.html" class="nav-link ">Tools</a><a href="virtual-lab.html" class="nav-link active">Virtual Lab</a><a href="periodic-table.html" class="nav-link ">Periodic Table</a><a href="index.html#molecule-viewer" class="nav-link ">3D Molecules</a><a href="study-hub.html" class="nav-link ">Study Hub</a><a href="index.html#research" class="nav-link ">Research</a></nav>
+        <div class="nav-actions">
+          <button type="button" class="nav-search-btn" onclick="openSearchPalette()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <a href="virtual-lab.html" class="btn btn-primary btn-sm">Launch Lab</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
+    <div class="sec-head">
+      <span class="sec-eyebrow">Digital Workstation</span>
+      <h1 class="sec-title">Virtual Chemistry Laboratory</h1>
+      <p class="sec-subtitle">Controlled simulation environment for titrations, colorimetric pH detection, and ionic precipitation.</p>
+    </div>
+    <div class="vlab-dashboard">
+      <div class="vlab-exp-bar">
+        <button type="button" class="vlab-exp-tab active" data-exp="titration" onclick="switchLabExperiment('titration')">Acid-Base Titration</button>
+        <button type="button" class="vlab-exp-tab" data-exp="indicator" onclick="switchLabExperiment('indicator')">Universal pH Indicator</button>
+        <button type="button" class="vlab-exp-tab" data-exp="precipitation" onclick="switchLabExperiment('precipitation')">Precipitation Reactions</button>
+      </div>
+      <div class="vlab-workspace-grid">
+        <div class="vlab-stage">
+          <div id="view_titration" class="vlab-exp-view" style="width:100%;height:100%;">
+            <div class="vlab-apparatus-center">
+              <div class="titration-rig">
+                <div class="lab-stand-base"></div>
+                <div class="lab-stand-rod"></div>
+                <div class="lab-clamp"></div>
+                <div class="glass-burette"><div class="burette-liquid" id="buretteLiquid" style="height:100%;"></div></div>
+                <div class="burette-valve" onclick="toggleBuretteValve()"><div class="valve-handle" id="valveHandle"></div></div>
+                <div class="droplet-emitter" id="dropletEmitter"></div>
+                <div class="erlenmeyer-flask"><div class="flask-body"><div class="flask-solution" id="flaskSolution"></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div id="view_indicator" class="vlab-exp-view" style="display:none;width:100%;height:100%;">
+            <div class="vlab-apparatus-center">
+              <div class="test-tube-slot">
+                <div class="test-tube-glass" style="width:50px;height:240px;border-radius:0 0 25px 25px;">
+                  <div class="test-tube-fluid" id="indicatorTubeFluid" style="height:70%;background:#10b981;"></div>
+                </div>
+                <div id="indicatorDesc" style="color:#fff;margin-top:1rem;font-size:0.95rem;">Neutral Pure Water: Emerald Green (pH 7.0)</div>
+              </div>
+            </div>
+          </div>
+          <div id="view_precipitation" class="vlab-exp-view" style="display:none;width:100%;height:100%;">
+            <div class="vlab-apparatus-center">
+              <div class="test-tube-slot">
+                <div class="test-tube-glass" style="width:50px;height:240px;border-radius:0 0 25px 25px;">
+                  <div class="test-tube-fluid" id="precipitateTubeFluid" style="height:65%;background:rgba(255,255,255,0.9);"></div>
+                </div>
+                <div id="precipitateReactionLabel" style="color:#fff;margin-top:1rem;font-size:0.95rem;text-align:center;">
+                  <strong>AgNO₃ (aq) + NaCl (aq) → AgCl (s)↓ + NaNO₃ (aq)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="vlab-bench-surface"></div>
+        </div>
+        <div class="vlab-sidebar">
+          <div class="vlab-gauge-card">
+            <div class="gauge-header"><span>Digital pH Sensor</span><span class="chip chip-emerald">Active</span></div>
+            <div class="gauge-readout" id="vlabPHReadout">1.00</div>
+            <div style="font-size:0.85rem;color:var(--text-muted);display:flex;justify-content:space-between;margin-top:0.4rem;">
+              <span>0.100 M HCl (25.0 mL)</span>
+              <span id="vlabAddedVol" style="color:var(--color-cobalt);font-family:var(--font-mono);font-weight:700;">0.00 mL</span>
+            </div>
+          </div>
+          <div class="vlab-gauge-card">
+            <div class="gauge-header"><span>Dynamic Titration Graph</span><span class="mono text-emerald">V_eq = 25.0 mL</span></div>
+            <canvas id="titrationCurveCanvas"></canvas>
+          </div>
+          <div class="vlab-controls-group">
+            <div class="vlab-action-buttons">
+              <button class="btn btn-primary btn-sm" onclick="toggleBuretteValve()" style="flex:1;">Toggle Valve</button>
+              <button class="btn btn-ghost btn-sm" onclick="dispenseSingleDrop()">+0.1 mL Drop</button>
+              <button class="btn btn-ghost btn-sm" onclick="resetTitration()">Reset</button>
+            </div>
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
+              <button class="chip chip-emerald" onclick="testIndicatorSubstance('hcl')">1M HCl</button>
+              <button class="chip chip-emerald" onclick="testIndicatorSubstance('lemon')">Lemon</button>
+              <button class="chip chip-emerald" onclick="testIndicatorSubstance('water')">Water</button>
+              <button class="chip chip-emerald" onclick="testIndicatorSubstance('bleach')">Bleach</button>
+              <button class="chip chip-cobalt" onclick="mixPrecipitation('AgNO3_NaCl')">AgCl Precipitate</button>
+              <button class="chip chip-amber" onclick="mixPrecipitation('PbNO3_KI')">PbI₂ Golden Rain</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;color:#fff;">Observation Log:</div>
+            <div class="vlab-observation-log" id="vlabLog">
+              <div class="log-entry"><span class="log-timestamp">[Ready]</span> Virtual lab calibrated.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 ChemAI Laboratory. Free Interactive Chemistry Educational Suite.</div>
+        <div><a href="index.html" class="text-emerald">Return to Main Platform →</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Calculator Modal -->
+  <div class="modal-backdrop" id="calculatorModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="calcModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="calcModalTitle">Chemistry Calculator</h3>
+        <button type="button" class="modal-close-btn" onclick="closeCalculatorModal()" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="calcModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal-container search-modal-container">
+      <div class="search-input-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-emerald)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchPaletteInput" class="search-main-input" placeholder="Search any calculator, element or simulation..." autocomplete="off">
+        <button type="button" class="modal-close-btn" onclick="closeSearchPalette()"><kbd>ESC</kbd></button>
+      </div>
+      <ul class="search-results-list" id="searchResultsList"></ul>
+    </div>
+  </div>
+
+  
+  <script src="js/periodic-table-data.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/calculators.js"></script>
+  <script src="js/periodic-table.js"></script>
+  <script src="js/virtual-lab.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/notes-generator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+
