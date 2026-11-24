@@ -1,16 +1,27 @@
 /* ==========================================================================
-   ChemAI Platform - AI Chemistry Assistant Engine
-   Intelligent problem solver, equation renderer & conversational tutor
+   ChemAI Platform - Advanced AI Chemistry Assistant & Voice Companion
+   Gemini API Backend integration, 4 response styles, Voice I/O, KaTeX Math
    ========================================================================== */
 
-(function initAIAssistant() {
-  const KNOWLEDGE_BASE = [
+(function initAdvancedAIAssistant() {
+  let conversationHistory = [];
+  let currentResponseStyle = "detailed";
+  let lastUserMessage = "";
+  let lastBotResponse = "";
+  let recognitionInstance = null;
+  let isListening = false;
+  let synthUtterance = null;
+  let isSpeaking = false;
+  let isPaused = false;
+
+  // Scientific Offline Fallback Knowledge Base (for static GitHub Pages or offline use)
+  const OFFLINE_KB = [
     {
       keywords: ["balance", "equation", "reaction"],
       title: "Chemical Equation Balancing",
-      response: `To balance a chemical equation, ensure the number of atoms of each element is equal on both sides according to the **Law of Conservation of Mass**:
+      response: `To balance a chemical equation, ensure equal atom counts on both sides according to the **Law of Conservation of Mass**:
 
-<div class="chem-equation-box">4Fe (s) + 3O₂ (g) → 2Fe₂O₃ (s)</div>
+<div class="chem-equation-box">$$4\text{Fe (s)} + 3\text{O}_2\text{ (g)} \longrightarrow 2\text{Fe}_2\text{O}_3\text{ (s)}$$</div>
 
 <div class="step-box">
   <div class="step-box-title">Step 1: Count Initial Atoms</div>
@@ -20,14 +31,14 @@
 
 <div class="step-box">
   <div class="step-box-title">Step 2: Balance Oxygen First</div>
-  LCM of 2 and 3 is 6. Add coefficient 3 to O₂ and 2 to Fe₂O₃:<br>
+  LCM of 2 and 3 is 6. Multiply $\text{O}_2$ by 3 and $\text{Fe}_2\text{O}_3$ by 2:<br>
   <code>Fe + 3O₂ → 2Fe₂O₃</code>
 </div>
 
 <div class="step-box">
   <div class="step-box-title">Step 3: Balance Metal Atoms</div>
   Products now have 4 Fe. Add coefficient 4 to reactant Fe:<br>
-  <strong class="text-emerald">Balanced: 4Fe + 3O₂ → 2Fe₂O₃ (ΔH° = -1648 kJ/mol)</strong>
+  <strong class="text-emerald">Balanced: 4Fe + 3O₂ → 2Fe₂O₃ ($\Delta H^\circ = -1648\text{ kJ/mol}$)</strong>
 </div>`
     },
     {
@@ -45,242 +56,389 @@
   </thead>
   <tbody>
     <tr><td>Mechanism</td><td>Two steps (Carbocation intermediate)</td><td>One step (Concerted transition state)</td></tr>
-    <tr><td>Kinetics</td><td>First order: Rate = k[R-X]</td><td>Second order: Rate = k[R-X][Nu⁻]</td></tr>
+    <tr><td>Kinetics</td><td>First order: $\text{Rate} = k[R-X]$</td><td>Second order: $\text{Rate} = k[R-X][Nu^-]$</td></tr>
     <tr><td>Substrate</td><td>3° > 2° >> 1° (Steric stability)</td><td>CH₃ > 1° > 2° >> 3° (Steric hindrance)</td></tr>
     <tr><td>Stereochemistry</td><td>Racemization (inversion + retention)</td><td>Complete Walden Inversion (100% backside attack)</td></tr>
-    <tr><td>Solvent</td><td>Polar protic (H₂O, EtOH, MeOH stabilizes carbocation)</td><td>Polar aprotic (Acetone, DMSO, DMF maximizes Nu⁻ nucleophilicity)</td></tr>
+    <tr><td>Solvent</td><td>Polar protic (H₂O, EtOH, MeOH stabilizes carbocation)</td><td>Polar aprotic (Acetone, DMSO, DMF maximizes Nu⁻)</td></tr>
   </tbody>
 </table>`
     },
     {
-      keywords: ["bond", "bonding", "covalent", "ionic"],
-      title: "Chemical Bonding Principles",
-      response: `Chemical bonds form to achieve stable low-energy octet electron configurations:
+      keywords: ["bond", "bonding", "covalent", "ionic", "vsepr"],
+      title: "Chemical Bonding & VSEPR Geometries",
+      response: `Chemical bonds form to achieve stable minimum-energy octet electron configurations:
 
 <div class="step-box">
-  <div class="step-box-title">1. Ionic Bonding (ΔEN > 1.7)</div>
-  Complete transfer of valence electrons from an electropositive metal to an electronegative nonmetal.<br>
-  Example: <strong>Na (3s¹) + Cl (3p⁵) → Na⁺ [Ne] + Cl⁻ [Ar]</strong> forming a 3D crystal lattice.
+  <div class="step-box-title">1. Ionic Bonding ($\Delta EN > 1.7$)</div>
+  Complete valence electron transfer: $\text{Na (3s¹)} + \text{Cl (3p⁵)} \to \text{Na}^+ [\text{Ne}] + \text{Cl}^- [\text{Ar}]$.
 </div>
 
 <div class="step-box">
-  <div class="step-box-title">2. Covalent Bonding (ΔEN < 1.7)</div>
-  Valence electron sharing between nonmetals. Single (σ), double (σ + π), and triple (σ + 2π) bonds.<br>
-  Example: <strong>H₂O</strong> (sp³ hybridized, 104.5° bent geometry due to two lone pairs).
+  <div class="step-box-title">2. Covalent Bonding ($\Delta EN < 1.7$)</div>
+  Valence electron sharing: single ($\sigma$), double ($\sigma + \pi$), and triple ($\sigma + 2\pi$) bonds.
 </div>
 
 <div class="step-box">
-  <div class="step-box-title">3. Intermolecular Forces (IMFs)</div>
-  London Dispersion < Dipole-Dipole < Hydrogen Bonding (H bonded to N, O, or F).
+  <div class="step-box-title">3. VSEPR Molecular Geometry</div>
+  Electron pairs repel each other: Lone Pair-Lone Pair > Lone Pair-Bonding Pair > Bonding Pair-Bonding Pair.
 </div>`
-    },
-    {
-      keywords: ["molar", "mass", "molecular", "weight"],
-      title: "Molar Mass Determination",
-      response: `Molar mass ($M$) represents the mass in grams of one mole ($6.022 \\times 10^{23}$) of particles.
-
-For hydrated copper sulfate <strong>CuSO₄ · 5H₂O</strong>:
-<ul>
-  <li>Cu: 1 × 63.546 = 63.546 g/mol</li>
-  <li>S: 1 × 32.060 = 32.060 g/mol</li>
-  <li>O: (4 + 5) × 15.999 = 143.991 g/mol</li>
-  <li>H: (5 × 2) × 1.008 = 10.080 g/mol</li>
-</ul>
-<div class="chem-equation-box">Total Molar Mass = 249.677 g/mol</div>
-Elemental Composition: <strong>57.67% Oxygen, 25.45% Copper, 12.84% Sulfur, 4.04% Hydrogen</strong>.`
     },
     {
       keywords: ["stoichiometry", "limiting", "reagent", "yield"],
       title: "Stoichiometry & Limiting Reagents",
-      response: `Stoichiometry relates mole quantities of reactants and products:
+      response: `Stoichiometry calculates mass-mole quantities from balanced chemical equations:
 
 <div class="step-box">
-  <div class="step-box-title">Example Problem</div>
-  How much water is produced when <strong>16.0 g of O₂</strong> reacts with <strong>4.0 g of H₂</strong>?<br>
-  Reaction: <code>2H₂ + O₂ → 2H₂O</code>
-</div>
-
-<div class="step-box">
-  <div class="step-box-title">Step 1: Convert Grams to Moles</div>
-  Moles H₂ = 4.0 g / 2.016 g/mol = <strong>1.984 mol</strong><br>
-  Moles O₂ = 16.0 g / 31.998 g/mol = <strong>0.500 mol</strong>
-</div>
-
-<div class="step-box">
-  <div class="step-box-title">Step 2: Determine Limiting Reagent</div>
-  1 mol O₂ requires 2 mol H₂. So 0.500 mol O₂ requires 1.00 mol H₂.<br>
-  Since we have 1.984 mol H₂, <strong>O₂ is the limiting reagent</strong>.
-</div>
-
-<div class="step-box">
-  <div class="step-box-title">Step 3: Theoretical Yield</div>
-  Moles H₂O formed = 2 × 0.500 mol = 1.00 mol H₂O<br>
-  <strong class="text-emerald">Mass H₂O = 1.00 mol × 18.015 g/mol = 18.02 grams</strong>
-</div>`
-    },
-    {
-      keywords: ["electrochemistry", "nernst", "galvanic", "redox"],
-      title: "Electrochemistry & Galvanic Cells",
-      response: `Electrochemistry bridges electrical potential and chemical free energy:
-
-<div class="chem-equation-box">ΔG° = -n F E°cell</div>
-
-<div class="step-box">
-  <div class="step-box-title">Daniell Cell Example</div>
-  <strong>Anode (Oxidation):</strong> Zn (s) → Zn²⁺ (aq) + 2e⁻ (E° = +0.76 V)<br>
-  <strong>Cathode (Reduction):</strong> Cu²⁺ (aq) + 2e⁻ → Cu (s) (E° = +0.34 V)<br>
-  <span class="text-emerald">E°cell = E°cathode - E°anode = 0.34 - (-0.76) = <strong>+1.10 V</strong></span>
-</div>
-
-<div class="step-box">
-  <div class="step-box-title">Nernst Equation (Non-Standard Conditions)</div>
-  <code>E = E° - (0.0592 / n) · log₁₀(Q) at 298 K</code><br>
-  When reaction reaches equilibrium: Q = K and E = 0.
+  <div class="step-box-title">Problem: 16.0 g of O₂ reacting with 4.0 g of H₂</div>
+  Reaction: $2\text{H}_2 + \text{O}_2 \longrightarrow 2\text{H}_2\text{O}$<br><br>
+  1. $\text{Moles of } \text{H}_2 = \frac{4.0\text{ g}}{2.016\text{ g/mol}} = 1.984\text{ mol}$<br>
+  2. $\text{Moles of } \text{O}_2 = \frac{16.0\text{ g}}{31.998\text{ g/mol}} = 0.500\text{ mol}$<br>
+  3. Mole ratio requires $2 \times 0.500 = 1.00\text{ mol } \text{H}_2$. Since we have 1.984 mol $\text{H}_2$, $\text{O}_2$ is the **Limiting Reagent**.<br>
+  4. **Theoretical Yield:** $0.500\text{ mol } \text{O}_2 \times 2 = 1.00\text{ mol } \text{H}_2\text{O} = 18.015\text{ g}$.
 </div>`
     }
   ];
 
-  let chatHistory = [];
-
-  function appendMessage(sender, htmlContent) {
-    const container = document.getElementById("chatMessagesArea");
-    if (!container) return;
-
-    const msg = document.createElement("div");
-    msg.className = `chat-message ${sender}`;
-
-    const avatar = document.createElement("div");
-    avatar.className = "chat-avatar";
-    avatar.innerHTML = sender === "bot" ? "AI" : "You";
-
-    const bubble = document.createElement("div");
-    bubble.className = "chat-bubble";
-    bubble.innerHTML = htmlContent;
-
-    msg.appendChild(avatar);
-    msg.appendChild(bubble);
-    container.appendChild(msg);
-
-    container.scrollTop = container.scrollHeight;
-  }
-
-  function generateAIResponse(query) {
-    const lower = query.toLowerCase().trim();
-
-    // Check pre-computed knowledge base
-    for (const item of KNOWLEDGE_BASE) {
-      if (item.keywords.some((k) => lower.includes(k))) {
+  function getOfflineResponse(text, style) {
+    const q = text.toLowerCase();
+    for (const item of OFFLINE_KB) {
+      if (item.keywords.some((k) => q.includes(k))) {
         return item.response;
       }
     }
 
-    // Check element lookup
-    if (window.PERIODIC_TABLE_DATA) {
-      const el = window.PERIODIC_TABLE_DATA.find(
-        (e) => lower.includes(e.name.toLowerCase()) || lower.split(" ").includes(e.sym.toLowerCase())
-      );
-      if (el) {
-        return `Here is information on <strong>${el.name} (${el.sym})</strong>:
-<ul>
-  <li><strong>Atomic Number:</strong> ${el.num}</li>
-  <li><strong>Atomic Mass:</strong> ${el.mass} u</li>
-  <li><strong>Category:</strong> ${el.cat.replace(/-/g, " ").toUpperCase()}</li>
-  <li><strong>Electron Configuration:</strong> ${el.config}</li>
-  <li><strong>Electronegativity:</strong> ${el.en || "N/A"}</li>
-  <li><strong>Standard State:</strong> ${el.state}</li>
-  <li><strong>Key Applications:</strong> ${el.uses}</li>
-</ul>`;
-      }
-    }
+    return `### ChemAI Scientific Analysis
 
-    // Default intelligent tutor fallback
-    return `I received your chemistry question: "<em>${query}</em>"
+**Core Scientific Concept:**
+Chemical processes and transformations follow the fundamental laws of thermodynamics ($\Delta G^\circ = \Delta H^\circ - T\Delta S^\circ$) and quantum molecular orbital stability.
 
-To explore this concept in detail:
-<ul>
-  <li><strong>Key Principle:</strong> Chemistry reactions proceed toward lower enthalpy (ΔH < 0) and higher system entropy (ΔS > 0).</li>
-  <li><strong>Interactive Tools:</strong> You can model this in the <a href="#tools" class="text-emerald">Tools Dashboard</a> or run a live simulation in the <a href="#virtual-lab" class="text-emerald">Virtual Chemistry Lab</a>.</li>
-  <li><strong>Next step:</strong> Try asking about specific reaction equations, bonding geometries, or pH calculations.</li>
-</ul>`;
+**Recommended Exploration Steps:**
+1. **Interactive Tools:** Model this reaction in the <a href="#tools" class="text-emerald" style="text-decoration:underline;">Calculators Dashboard</a>.
+2. **Virtual Simulations:** Run live digital titrations or VSEPR simulations in the <a href="#virtual-lab" class="text-emerald" style="text-decoration:underline;">Virtual Chemistry Lab</a>.
+3. **3D Molecular Models:** Examine spatial conformations in the <a href="#molecule-viewer" class="text-emerald" style="text-decoration:underline;">3D Molecule Viewer</a>.
+
+*Tip: Connect your Gemini API key in <code>.env</code> for unlimited live generative chemistry tutoring!*`;
   }
 
+  // Append Chat Message
+  function appendMessage(sender, htmlContent, rawTextForSpeech = "") {
+    const area = document.getElementById("chatMessagesArea");
+    if (!area) return;
+
+    const row = document.createElement("div");
+    row.className = `chat-message ${sender}`;
+
+    const isBot = sender === "bot";
+    const avatar = isBot ? "AI" : "You";
+
+    const speechText = rawTextForSpeech || (typeof htmlContent === "string" ? htmlContent.replace(/<[^>]*>/g, "") : "");
+
+    row.innerHTML = `
+      <div class="chat-avatar">${avatar}</div>
+      <div class="chat-bubble">
+        ${htmlContent}
+        ${isBot ? `
+          <div class="chat-msg-actions">
+            <button type="button" class="chat-action-btn" onclick="window.speakTextMessage(this)" data-speech="${encodeURIComponent(speechText)}" title="Read Aloud">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Listen</span>
+            </button>
+            <button type="button" class="chat-action-btn" onclick="window.copyMessageText(this)" title="Copy text">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <button type="button" class="chat-action-btn" onclick="window.regenerateLastResponse()" title="Regenerate Response">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Regenerate</span>
+            </button>
+          </div>
+        ` : ""}
+      </div>
+    `;
+
+    area.appendChild(row);
+    area.scrollTop = area.scrollHeight;
+
+    // Trigger MathJax / KaTeX typesetting if present
+    if (window.renderMathInElement) {
+      window.renderMathInElement(row, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
+    } else if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([row]).catch((err) => console.log(err));
+    }
+  }
+
+  // Show Typing Indicator
+  function showTypingIndicator() {
+    const area = document.getElementById("chatMessagesArea");
+    if (!area) return null;
+
+    const ind = document.createElement("div");
+    ind.id = "chatTypingIndicator";
+    ind.className = "chat-message bot";
+    ind.innerHTML = `
+      <div class="chat-avatar">AI</div>
+      <div class="chat-bubble" style="display:flex;align-items:center;gap:6px;padding:0.75rem 1.25rem;">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span style="font-size:0.82rem;color:var(--text-dim);margin-left:8px;">ChemAI is analyzing...</span>
+      </div>
+    `;
+    area.appendChild(ind);
+    area.scrollTop = area.scrollHeight;
+    return ind;
+  }
+
+  function removeTypingIndicator() {
+    const ind = document.getElementById("chatTypingIndicator");
+    if (ind) ind.remove();
+  }
+
+  // Send Message to Backend Gemini API
+  async function sendMessage(text) {
+    if (!text || !text.trim()) return;
+    const cleanText = text.trim();
+    lastUserMessage = cleanText;
+
+    appendMessage("user", cleanText);
+    conversationHistory.push({ role: "user", content: cleanText });
+
+    const indicator = showTypingIndicator();
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: cleanText,
+          style: currentResponseStyle,
+          history: conversationHistory.slice(-6)
+        })
+      });
+
+      removeTypingIndicator();
+
+      if (response.ok) {
+        const data = await response.json();
+        const reply = data.reply || "I am analyzing this chemical problem.";
+        lastBotResponse = reply;
+        conversationHistory.push({ role: "assistant", content: reply });
+        
+        let formatted = formatMarkdownReply(reply);
+        if (data.note) {
+          formatted += `<div style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;border-top:1px dashed var(--border-subtle);padding-top:4px;">ℹ️ ${data.note}</div>`;
+        }
+        appendMessage("bot", formatted, reply);
+      } else {
+        // Fallback to offline knowledge base
+        const fallback = getOfflineResponse(cleanText, currentResponseStyle);
+        lastBotResponse = fallback;
+        conversationHistory.push({ role: "assistant", content: fallback });
+        appendMessage("bot", formatMarkdownReply(fallback), fallback);
+      }
+    } catch (err) {
+      removeTypingIndicator();
+      // Graceful offline fallback
+      const fallback = getOfflineResponse(cleanText, currentResponseStyle);
+      lastBotResponse = fallback;
+      conversationHistory.push({ role: "assistant", content: fallback });
+      appendMessage("bot", formatMarkdownReply(fallback), fallback);
+    }
+  }
+
+  // Simple Markdown & Equation Formatter
+  function formatMarkdownReply(text) {
+    if (!text) return "";
+    let html = text
+      .replace(/### (.*?)\n/g, '<h4 style="color:#fff;margin:0.5rem 0 0.35rem 0;font-size:1.05rem;">$1</h4>')
+      .replace(/## (.*?)\n/g, '<h3 style="color:#10b981;margin:0.75rem 0 0.4rem 0;font-size:1.15rem;">$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/```([\s\S]*?)```/g, '<pre style="background:var(--bg-deep);padding:0.75rem;border-radius:6px;overflow-x:auto;"><code>$1</code></pre>')
+      .replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.1);padding:2px 5px;border-radius:4px;font-family:monospace;">$1</code>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+    return html;
+  }
+
+  // Voice Input Setup (Speech-to-Text)
+  function setupSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    recognitionInstance = new SpeechRecognition();
+    recognitionInstance.continuous = false;
+    recognitionInstance.interimResults = true;
+    recognitionInstance.lang = "en-US";
+
+    const input = document.getElementById("chatUserInput");
+    const micBtn = document.getElementById("chatMicBtn");
+
+    recognitionInstance.onstart = () => {
+      isListening = true;
+      if (micBtn) {
+        micBtn.classList.add("listening");
+        micBtn.innerHTML = '<span class="mic-pulse"></span><span style="font-size:0.75rem;">Listening...</span>';
+      }
+      if (input) input.placeholder = "Listening... Speak your chemistry question now.";
+    };
+
+    recognitionInstance.onresult = (event) => {
+      let transcript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      if (input) input.value = transcript;
+    };
+
+    recognitionInstance.onerror = (event) => {
+      console.warn("Speech recognition error:", event.error);
+      stopListening();
+    };
+
+    recognitionInstance.onend = () => {
+      stopListening();
+      if (input && input.value.trim()) {
+        window.handleChatSubmit();
+      }
+    };
+  }
+
+  function startListening() {
+    if (!recognitionInstance) {
+      setupSpeechRecognition();
+    }
+    if (!recognitionInstance) {
+      alert("Speech recognition is not supported in this browser. Please try Chrome, Edge, or Safari.");
+      return;
+    }
+    try {
+      recognitionInstance.start();
+    } catch (e) {
+      recognitionInstance.stop();
+    }
+  }
+
+  function stopListening() {
+    isListening = false;
+    const micBtn = document.getElementById("chatMicBtn");
+    const input = document.getElementById("chatUserInput");
+    if (micBtn) {
+      micBtn.classList.remove("listening");
+      micBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      `;
+    }
+    if (input) input.placeholder = "Ask anything in chemistry (e.g. balance equations, reaction mechanisms)...";
+  }
+
+  // Voice Output Setup (Text-to-Speech)
+  function cleanSpeechText(raw) {
+    if (!raw) return "";
+    let s = decodeURIComponent(raw);
+    // Replace chemical formula subscripts with spoken words
+    s = s.replace(/H₂O/g, "H 2 O")
+         .replace(/CO₂/g, "C O 2")
+         .replace(/CH₄/g, "C H 4")
+         .replace(/H₂SO₄/g, "H 2 S O 4")
+         .replace(/O₂/g, "oxygen gas")
+         .replace(/N₂/g, "nitrogen gas")
+         .replace(/ΔH/g, "delta H")
+         .replace(/ΔG/g, "delta G")
+         .replace(/ΔS/g, "delta S")
+         .replace(/→/g, "produces")
+         .replace(/⇌/g, "is in equilibrium with");
+    return s;
+  }
+
+  // Global Exposed Functions
   window.handleChatSubmit = function(e) {
     if (e) e.preventDefault();
     const input = document.getElementById("chatUserInput");
     if (!input) return;
     const text = input.value.trim();
     if (!text) return;
-
-    appendMessage("user", text);
     input.value = "";
-
-    // Show typing status indicator
-    setTimeout(() => {
-      const responseHtml = generateAIResponse(text);
-      appendMessage("bot", responseHtml);
-    }, 400);
+    sendMessage(text);
   };
 
   window.sendQuickPrompt = function(promptText) {
-    appendMessage("user", promptText);
-    setTimeout(() => {
-      const responseHtml = generateAIResponse(promptText);
-      appendMessage("bot", responseHtml);
-    }, 350);
+    sendMessage(promptText);
+  };
+
+  window.setChatStyle = function(styleKey) {
+    currentResponseStyle = styleKey;
+    document.querySelectorAll(".chat-style-pill").forEach((pill) => {
+      pill.classList.toggle("active", pill.getAttribute("data-style") === styleKey);
+    });
   };
 
   window.clearChatHistory = function() {
+    conversationHistory = [];
     const container = document.getElementById("chatMessagesArea");
     if (container) {
       container.innerHTML = `
         <div class="chat-message bot">
           <div class="chat-avatar">AI</div>
           <div class="chat-bubble">
-            <p><strong>Hello! I am ChemAI, your intelligent chemistry assistant.</strong></p>
-            <p>I can help you balance equations, analyze 3D molecules, compute molar masses, solve stoichiometry, and guide virtual experiments. What would you like to explore today?</p>
+            <p><strong>Hello! I am ChemAI, your intelligent AI Chemistry Tutor &amp; Research Companion.</strong></p>
+            <p>I can help you balance chemical equations, resolve $S_N1/S_N2$ reaction mechanisms, compute stoichiometry, analyze 3D molecular geometries, and guide virtual laboratory experiments. What would you like to explore today?</p>
           </div>
         </div>
       `;
     }
   };
 
-  // Text-To-Speech Reader
-  window.speakLastMessage = function() {
+  window.regenerateLastResponse = function() {
+    if (lastUserMessage) {
+      sendMessage(lastUserMessage);
+    }
+  };
+
+  window.toggleVoiceInput = function() {
+    if (isListening) {
+      if (recognitionInstance) recognitionInstance.stop();
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  window.speakTextMessage = function(btn) {
     if (!("speechSynthesis" in window)) {
       alert("Text-to-speech is not supported on this browser.");
       return;
     }
-    const bubbles = document.querySelectorAll(".bot .chat-bubble");
-    if (bubbles.length === 0) return;
-    const lastText = bubbles[bubbles.length - 1].innerText;
+    const raw = btn.getAttribute("data-speech");
+    const clean = cleanSpeechText(raw);
+
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(lastText);
+    const utterance = new SpeechSynthesisUtterance(clean);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     window.speechSynthesis.speak(utterance);
   };
 
-  // Image Upload Analysis Simulation
-  window.triggerImageUpload = function() {
-    const input = document.getElementById("chatImageUploadInput");
-    if (input) input.click();
-  };
-
-  window.handleImageSelected = function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    appendMessage("user", `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Uploaded image: <em>${file.name}</em>`);
-
-    setTimeout(() => {
-      appendMessage("bot", `
-<div class="step-box">
-  <div class="step-box-title">📷 Visual OCR Chemistry Problem Solved</div>
-  Detected Equation: <strong>Fe₂O₃ + 3CO → 2Fe + 3CO₂</strong><br>
-  Process: <strong>Blast Furnace Blast Reduction of Hematite Iron Ore</strong><br>
-  Redox Analysis: Iron is reduced from Fe(III) to Fe(0); Carbon is oxidized from C(+2) to C(+4).
-</div>`);
-    }, 600);
+  window.copyMessageText = function(btn) {
+    const bubble = btn.closest(".chat-bubble");
+    if (!bubble) return;
+    const text = bubble.innerText.replace(/Listen|Copy|Regenerate/g, "").trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span>Copied!</span>';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    });
   };
 
   window.addEventListener("DOMContentLoaded", () => {
@@ -290,7 +448,9 @@ To explore this concept in detail:
     const clearBtn = document.getElementById("chatClearBtn");
     if (clearBtn) clearBtn.addEventListener("click", window.clearChatHistory);
 
-    const ttsBtn = document.getElementById("chatTtsBtn");
-    if (ttsBtn) ttsBtn.addEventListener("click", window.speakLastMessage);
+    const micBtn = document.getElementById("chatMicBtn");
+    if (micBtn) micBtn.addEventListener("click", window.toggleVoiceInput);
+
+    setupSpeechRecognition();
   });
 })();

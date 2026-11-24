@@ -1,0 +1,144 @@
+﻿import os
+
+content = """/* ==========================================================================
+   ChemAI Platform - Spectroscopy & Research Hub Styles
+   ========================================================================== */
+
+.spectroscopy-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .spectroscopy-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spec-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spec-nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  width: 100%;
+}
+
+.spec-nav-tab:hover {
+  border-color: var(--color-emerald);
+  color: var(--text-highlight);
+  background: var(--bg-surface-elevated);
+}
+
+.spec-nav-tab.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--color-emerald);
+  color: var(--color-emerald);
+}
+
+.spec-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.spec-canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.spec-controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.spec-peak-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-top: 1rem;
+}
+
+.spec-peak-table th {
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-surface-elevated);
+  border-bottom: 2px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.spec-peak-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-main);
+}
+
+.spec-peak-table tr:hover td {
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.beer-lambert-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .beer-lambert-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cuvette-preview {
+  width: 120px;
+  height: 180px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.cuvette-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80%;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+"""
+
+with open("css/spectroscopy.css", "w", encoding="utf-8") as f:
+    f.write(content)
+print("Wrote css/spectroscopy.css")

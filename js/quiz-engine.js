@@ -1,144 +1,197 @@
 /* ==========================================================================
-   ChemAI Platform - Chemistry Quiz Generator & Practice Engine
+   ChemAI Platform - Advanced Chemistry Quiz Generator & Practice Engine
+   Supports 20 Chemistry Topics, 4 Difficulty Levels, Timed / Practice / Exam Modes
    ========================================================================== */
 
 (function initQuizEngine() {
-  const QUIZ_QUESTIONS = [
-    {
-      topic: "bonding",
-      diff: "easy",
-      q: "What is the molecular geometry of a water (H₂O) molecule according to VSEPR theory?",
-      options: ["Linear (180°)", "Bent (~104.5°)", "Trigonal planar (120°)", "Tetrahedral (109.5°)"],
-      answer: 1,
-      explanation: "Water has four electron pairs around Oxygen (two bonding pairs and two lone pairs). The lone pair repulsion compresses the bond angle to ~104.5°, resulting in a bent shape."
-    },
-    {
-      topic: "stoichiometry",
-      diff: "medium",
-      q: "How many moles of O₂ are required to completely combust 2 moles of propane (C₃H₈)?",
-      options: ["5 moles", "7.5 moles", "10 moles", "12 moles"],
-      answer: 2,
-      explanation: "The balanced combustion reaction is: C₃H₈ + 5O₂ → 3CO₂ + 4H₂O. Therefore, 2 moles of C₃H₈ require 2 × 5 = 10 moles of O₂."
-    },
-    {
-      topic: "acids",
-      diff: "easy",
-      q: "What is the pH of a 0.001 M HCl solution at 25°C?",
-      options: ["pH = 1.0", "pH = 3.0", "pH = 7.0", "pH = 11.0"],
-      answer: 1,
-      explanation: "HCl is a strong monoprotic acid that dissociates completely: [H⁺] = 0.001 M = 10⁻³ M. pH = -log₁₀(10⁻³) = 3.0."
-    },
-    {
-      topic: "thermodynamics",
-      diff: "hard",
-      q: "Under what conditions is a chemical reaction always spontaneous at all temperatures?",
-      options: [
-        "ΔH > 0 and ΔS > 0",
-        "ΔH < 0 and ΔS > 0",
-        "ΔH > 0 and ΔS < 0",
-        "ΔH < 0 and ΔS < 0"
-      ],
-      answer: 1,
-      explanation: "By Gibbs free energy: ΔG = ΔH - T·ΔS. When ΔH is negative (exothermic) and ΔS is positive (entropy increase), ΔG is strictly negative regardless of temperature T."
-    },
-    {
-      topic: "organic",
-      diff: "medium",
-      q: "Which reagent is commonly used in organic chemistry to oxidize a primary alcohol to an aldehyde without over-oxidizing to a carboxylic acid?",
-      options: [
-        "KMnO₄ (Potassium permanganate)",
-        "PCC (Pyridinium chlorochromate)",
-        "K₂Cr₂O₇ / H₂SO₄",
-        "LiAlH₄ (Lithium aluminum hydride)"
-      ],
-      answer: 1,
-      explanation: "PCC in anhydrous dichloromethane (CH₂Cl₂) is a mild oxidizing agent that selectively stops the oxidation of primary alcohols at the aldehyde stage."
-    },
-    {
-      topic: "periodic",
-      diff: "easy",
-      q: "Which element has the highest first ionization energy on the periodic table?",
-      options: ["Fluorine (F)", "Helium (He)", "Cesium (Cs)", "Oxygen (O)"],
-      answer: 1,
-      explanation: "Helium has the highest first ionization energy (2372 kJ/mol) because its two electrons are in the 1s orbital closest to the nucleus with zero inner-shell shielding."
-    }
-  ];
-
+  let questionsPool = [];
   let currentQuestions = [];
+  let userAnswers = []; // records { question, selectedIndex, isCorrect }
   let currentIndex = 0;
   let score = 0;
   let selectedOption = null;
+  let quizMode = "practice"; // practice, timed, exam
+  let timerInterval = null;
+  let timeRemaining = 20;
+  let totalTimeElapsed = 0;
+  let totalTimerInterval = null;
+
+  function getBaseQuestions() {
+    if (window.CHEMAI_QUIZ_QUESTIONS && Array.isArray(window.CHEMAI_QUIZ_QUESTIONS) && window.CHEMAI_QUIZ_QUESTIONS.length > 0) {
+      return window.CHEMAI_QUIZ_QUESTIONS;
+    }
+    return [
+      {
+        id: "atom_1", topic: "atomic", topicName: "Atomic Structure & Periodicity",
+        diff: "easy", type: "mcq",
+        q: "Which quantum number specifies the three-dimensional shape of an electron orbital?",
+        options: ["Principal quantum number (n)", "Azimuthal / Angular momentum quantum number (l)", "Magnetic quantum number (ml)", "Spin quantum number (ms)"],
+        answer: 1, explanation: "The azimuthal quantum number (l) designates orbital shape (0=s, 1=p, 2=d, 3=f)."
+      },
+      {
+        id: "bond_1", topic: "bonding", topicName: "Chemical Bonding & Molecular Structure",
+        diff: "easy", type: "mcq",
+        q: "What is the molecular geometry of a water (H2O) molecule according to VSEPR theory?",
+        options: ["Linear (180 deg)", "Bent (~104.5 deg)", "Trigonal planar (120 deg)", "Tetrahedral (109.5 deg)"],
+        answer: 1, explanation: "Water has two bonding pairs and two lone pairs on oxygen, compressing the bond angle to ~104.5 deg."
+      }
+    ];
+  }
 
   window.startQuiz = function() {
+    questionsPool = getBaseQuestions();
     const topic = document.getElementById("quizTopicSelect")?.value || "all";
     const diff = document.getElementById("quizDiffSelect")?.value || "all";
+    const mode = document.getElementById("quizModeSelect")?.value || "practice";
+    const count = parseInt(document.getElementById("quizCountSelect")?.value || "10", 10);
+    quizMode = mode;
 
-    currentQuestions = QUIZ_QUESTIONS.filter((item) => {
+    let filtered = questionsPool.filter(item => {
       const matchTopic = topic === "all" || item.topic === topic;
       const matchDiff = diff === "all" || item.diff === diff;
       return matchTopic && matchDiff;
     });
 
-    if (currentQuestions.length === 0) currentQuestions = QUIZ_QUESTIONS;
+    if (filtered.length === 0) {
+      filtered = questionsPool;
+    }
+
+    // Shuffle
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    currentQuestions = shuffled.slice(0, Math.min(count, shuffled.length));
 
     currentIndex = 0;
     score = 0;
     selectedOption = null;
+    userAnswers = [];
+    totalTimeElapsed = 0;
 
-    document.getElementById("quizSetupPanel").style.display = "none";
-    document.getElementById("quizResultPanel").style.display = "none";
-    document.getElementById("quizActivePanel").style.display = "block";
+    clearInterval(timerInterval);
+    clearInterval(totalTimerInterval);
+    totalTimerInterval = setInterval(() => { totalTimeElapsed++; }, 1000);
+
+    const setupPanel = document.getElementById("quizSetupPanel");
+    const resultPanel = document.getElementById("quizResultPanel");
+    const activePanel = document.getElementById("quizActivePanel");
+
+    if (setupPanel) setupPanel.style.display = "none";
+    if (resultPanel) resultPanel.style.display = "none";
+    if (activePanel) activePanel.style.display = "block";
+
+    const timerBadge = document.getElementById("quizTimerBadge");
+    if (timerBadge) {
+      timerBadge.style.display = quizMode === "timed" ? "inline-flex" : "none";
+    }
 
     renderQuestion();
   };
 
   function renderQuestion() {
+    clearInterval(timerInterval);
     const q = currentQuestions[currentIndex];
     selectedOption = null;
 
-    document.getElementById("quizQuestionCounter").textContent = `Question ${currentIndex + 1} of ${currentQuestions.length}`;
-    document.getElementById("quizQuestionText").textContent = q.q;
+    const counter = document.getElementById("quizQuestionCounter");
+    if (counter) counter.textContent = "Question " + (currentIndex + 1) + " of " + currentQuestions.length;
+
+    const topicBadge = document.getElementById("quizQuestionTopic");
+    if (topicBadge) topicBadge.textContent = q.topicName || q.topic;
+
+    const diffBadge = document.getElementById("quizQuestionDiff");
+    if (diffBadge) {
+      diffBadge.textContent = (q.diff || "medium").toUpperCase();
+      diffBadge.className = "chip chip-" + (q.diff === "easy" ? "emerald" : q.diff === "hard" || q.diff === "expert" ? "rose" : "cobalt");
+    }
+
+    const qText = document.getElementById("quizQuestionText");
+    if (qText) qText.textContent = q.q;
 
     const optContainer = document.getElementById("quizOptionsContainer");
-    optContainer.innerHTML = "";
-
-    q.options.forEach((text, idx) => {
-      const btn = document.createElement("button");
-      btn.className = "quiz-opt-btn";
-      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + idx)}</span> <span>${text}</span>`;
-      btn.addEventListener("click", () => selectOption(idx, btn));
-      optContainer.appendChild(btn);
-    });
+    if (optContainer) {
+      optContainer.innerHTML = "";
+      q.options.forEach((text, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "quiz-opt-btn";
+        btn.innerHTML = '<span class="opt-letter">' + String.fromCharCode(65 + idx) + '</span> <span>' + text + '</span>';
+        btn.addEventListener("click", () => selectOption(idx, btn));
+        optContainer.appendChild(btn);
+      });
+    }
 
     const expBox = document.getElementById("quizExplanationBox");
     if (expBox) expBox.style.display = "none";
 
     const nextBtn = document.getElementById("quizNextBtn");
     if (nextBtn) {
-      nextBtn.textContent = currentIndex === currentQuestions.length - 1 ? "Finish Quiz" : "Next Question";
+      nextBtn.textContent = currentIndex === currentQuestions.length - 1 ? "Finish Quiz" : "Next Question ->";
       nextBtn.disabled = true;
+    }
+
+    // Timed mode countdown
+    if (quizMode === "timed") {
+      timeRemaining = 20;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          handleTimeExpired();
+        }
+      }, 1000);
     }
   }
 
+  function updateTimerDisplay() {
+    const el = document.getElementById("quizTimerCount");
+    if (el) {
+      el.textContent = timeRemaining + "s";
+      el.style.color = timeRemaining <= 5 ? "var(--color-rose)" : "var(--color-emerald)";
+    }
+  }
+
+  function handleTimeExpired() {
+    if (selectedOption !== null) return;
+    selectOption(-1, null);
+  }
+
   function selectOption(idx, btnElement) {
-    if (selectedOption !== null) return; // Already answered
+    if (selectedOption !== null) return;
     selectedOption = idx;
+    clearInterval(timerInterval);
 
     const q = currentQuestions[currentIndex];
     const isCorrect = idx === q.answer;
     if (isCorrect) score++;
 
+    userAnswers.push({
+      question: q,
+      selectedIndex: idx,
+      isCorrect: isCorrect
+    });
+
     const buttons = document.querySelectorAll(".quiz-opt-btn");
     buttons.forEach((b, i) => {
       b.disabled = true;
-      if (i === q.answer) b.classList.add("correct");
-      else if (i === idx) b.classList.add("incorrect");
+      if (quizMode !== "exam") {
+        if (i === q.answer) b.classList.add("correct");
+        else if (i === idx) b.classList.add("incorrect");
+      } else {
+        if (i === idx) b.classList.add("selected");
+      }
     });
 
-    const expBox = document.getElementById("quizExplanationBox");
-    if (expBox) {
-      expBox.style.display = "block";
-      expBox.innerHTML = `<strong>${isCorrect ? "✓ Correct!" : "✗ Incorrect."}</strong> ${q.explanation}`;
+    if (quizMode !== "exam") {
+      const expBox = document.getElementById("quizExplanationBox");
+      if (expBox) {
+        expBox.style.display = "block";
+        if (idx === -1) {
+          expBox.innerHTML = '<strong style="color:var(--color-rose);">Time expired!</strong> The correct answer was <strong>' + String.fromCharCode(65 + q.answer) + '</strong>. ' + q.explanation;
+        } else {
+          expBox.innerHTML = '<strong style="color:' + (isCorrect ? 'var(--color-emerald)' : 'var(--color-rose)') + ';">' + (isCorrect ? 'Correct!' : 'Incorrect.') + '</strong> ' + q.explanation;
+        }
+      }
     }
 
     const nextBtn = document.getElementById("quizNextBtn");
@@ -155,22 +208,72 @@
   };
 
   function finishQuiz() {
-    document.getElementById("quizActivePanel").style.display = "none";
+    clearInterval(timerInterval);
+    clearInterval(totalTimerInterval);
+
+    const activePanel = document.getElementById("quizActivePanel");
     const resPanel = document.getElementById("quizResultPanel");
-    resPanel.style.display = "block";
+    if (activePanel) activePanel.style.display = "none";
+    if (resPanel) resPanel.style.display = "block";
 
     const pct = Math.round((score / currentQuestions.length) * 100);
-    document.getElementById("quizScoreDisplay").textContent = `${score} / ${currentQuestions.length} (${pct}%)`;
+    const scoreDisplay = document.getElementById("quizScoreDisplay");
+    if (scoreDisplay) scoreDisplay.textContent = score + " / " + currentQuestions.length + " (" + pct + "%)";
 
-    let msg = "Great effort! Review the study hub to master all chemistry topics.";
-    if (pct >= 80) msg = "Outstanding mastery! You have a solid grasp of chemical theory and equations.";
-    else if (pct >= 50) msg = "Good job! A few more practice sessions will get you to top scores.";
+    const timeDisplay = document.getElementById("quizTimeDisplay");
+    if (timeDisplay) {
+      const mins = Math.floor(totalTimeElapsed / 60);
+      const secs = totalTimeElapsed % 60;
+      timeDisplay.textContent = (mins > 0 ? mins + "m " : "") + secs + "s";
+    }
 
-    document.getElementById("quizFeedbackMessage").textContent = msg;
+    let grade = "Proficient";
+    let msg = "Good effort! Continue practicing to master advanced chemistry concepts.";
+    if (pct >= 90) {
+      grade = "Master Chemist";
+      msg = "Spectacular mastery! You demonstrate deep conceptual grasp and calculation precision.";
+    } else if (pct >= 70) {
+      grade = "Advanced Scholar";
+      msg = "Very strong comprehension across organic, inorganic, and physical domains.";
+    } else if (pct < 50) {
+      grade = "Developing Knowledge";
+      msg = "Keep going! Review the study notes and formula sheets below to strengthen fundamental laws.";
+    }
+
+    const gradeBadge = document.getElementById("quizGradeBadge");
+    if (gradeBadge) gradeBadge.textContent = grade;
+
+    const feedbackMsg = document.getElementById("quizFeedbackMessage");
+    if (feedbackMsg) feedbackMsg.textContent = msg;
+
+    // Render review items
+    const reviewContainer = document.getElementById("quizReviewContainer");
+    if (reviewContainer) {
+      reviewContainer.innerHTML = "";
+      userAnswers.forEach((ans, i) => {
+        const item = document.createElement("div");
+        item.style.cssText = "background:var(--bg-deep);border:1px solid " + (ans.isCorrect ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)") + ";border-radius:var(--radius-md);padding:1rem;margin-bottom:0.75rem;text-align:left;font-size:0.88rem;";
+        const userChoice = ans.selectedIndex === -1 ? "Timed Out" : ans.question.options[ans.selectedIndex];
+        const correctChoice = ans.question.options[ans.question.answer];
+        item.innerHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;"><strong style="color:var(--text-highlight);">Q' + (i + 1) + '. ' + ans.question.q + '</strong><span class="chip ' + (ans.isCorrect ? 'chip-emerald' : 'chip-rose') + '">' + (ans.isCorrect ? 'Correct' : 'Incorrect') + '</span></div>' +
+          '<div style="color:var(--text-muted);margin-bottom:0.3rem;">Your Answer: <span style="color:' + (ans.isCorrect ? 'var(--color-emerald)' : 'var(--color-rose)') + ';">' + userChoice + '</span> | Correct: <strong style="color:var(--color-emerald);">' + correctChoice + '</strong></div>' +
+          '<div style="font-size:0.82rem;color:var(--text-dim);border-top:1px dashed var(--border-subtle);padding-top:0.4rem;margin-top:0.4rem;"><em>Explanation:</em> ' + ans.question.explanation + '</div>';
+        reviewContainer.appendChild(item);
+      });
+    }
   }
 
   window.restartQuiz = function() {
-    document.getElementById("quizResultPanel").style.display = "none";
-    document.getElementById("quizSetupPanel").style.display = "block";
+    const resPanel = document.getElementById("quizResultPanel");
+    const setupPanel = document.getElementById("quizSetupPanel");
+    if (resPanel) resPanel.style.display = "none";
+    if (setupPanel) setupPanel.style.display = "block";
+  };
+
+  window.toggleQuizReview = function() {
+    const container = document.getElementById("quizReviewContainer");
+    if (container) {
+      container.style.display = container.style.display === "none" ? "block" : "none";
+    }
   };
 })();

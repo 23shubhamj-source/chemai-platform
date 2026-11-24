@@ -1,9 +1,42 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    ChemAI Platform - Master Application Controller (Part 1)
    Coordinates navigation, modals, search palette, and typing hero
    ========================================================================== */
 
 (function initApp() {
+  // 0. Dark / Light Mode Theme System
+  function initTheme() {
+    const savedTheme = localStorage.getItem("chemai_theme") || "dark";
+    window.applyTheme(savedTheme);
+  }
+
+  window.applyTheme = function(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    if (document.body) document.body.setAttribute("data-theme", theme);
+    try { localStorage.setItem("chemai_theme", theme); } catch(e) {}
+
+    const icons = document.querySelectorAll(".theme-toggle-icon");
+    icons.forEach(icon => {
+      icon.textContent = theme === "light" ? "🌙" : "☀️";
+    });
+
+    const btns = document.querySelectorAll(".theme-toggle-btn");
+    btns.forEach(btn => {
+      btn.setAttribute("title", theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode");
+      btn.setAttribute("aria-label", theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode");
+    });
+
+    window.dispatchEvent(new CustomEvent("chemai:themechange", { detail: { theme } }));
+  };
+
+  window.toggleTheme = function() {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const next = current === "light" ? "dark" : "light";
+    window.applyTheme(next);
+  };
+
+  initTheme();
+
   // 1. Hero Dynamic Typing Animation
   const typingPhrases = [
     "balance complex chemical equations.",
@@ -64,10 +97,16 @@
     { title: "Acid-Base Titration Lab", cat: "Virtual Lab", action: () => { window.location.hash = "#virtual-lab"; window.switchLabExperiment?.("titration"); }, desc: "Burette drip simulation with real-time pH titration curve." },
     { title: "Universal pH Indicator Lab", cat: "Virtual Lab", action: () => { window.location.hash = "#virtual-lab"; window.switchLabExperiment?.("indicator"); }, desc: "Test common household chemicals on 0-14 pH scale." },
     { title: "Precipitation Reactions Lab", cat: "Virtual Lab", action: () => { window.location.hash = "#virtual-lab"; window.switchLabExperiment?.("precipitation"); }, desc: "Mixing ionic salts with solubility rules breakdown." },
-    { title: "Interactive Periodic Table", cat: "Molecular Tools", action: () => { window.location.hash = "#periodic-table"; }, desc: "Explore all 118 IUPAC elements with physical constants." },
+    { title: "Interactive Periodic Table", cat: "Molecular Tools", action: () => { window.location.href = "periodic-table.html"; }, desc: "Explore all 118 IUPAC elements with physical constants." },
     { title: "3D Molecule Viewer", cat: "Molecular Tools", action: () => { window.location.hash = "#molecule-viewer"; }, desc: "WebGL 3D Ball-and-Stick and Space-Filling molecular viewer." },
-    { title: "Chemistry Quiz Generator", cat: "Study Tools", action: () => { window.location.hash = "#study-tools"; }, desc: "Custom multiple-choice chemistry quizzes with explanations." },
-    { title: "AI Notes Generator", cat: "Study Tools", action: () => { window.location.hash = "#study-tools"; }, desc: "High-yield structured study sheets and revision summaries." }
+    { title: "Chemistry Quiz Generator", cat: "Study Tools", action: () => { window.location.href = "study-hub.html#quiz"; }, desc: "Custom multiple-choice chemistry quizzes with explanations." },
+    { title: "AI Notes Generator", cat: "Study Tools", action: () => { window.location.href = "study-hub.html#notes"; }, desc: "High-yield structured study sheets and revision summaries." },
+    { title: "Build-A-Molecule Simulator", cat: "Simulations", action: () => { window.location.href = "simulations.html"; }, desc: "Interactive 2D/3D constructor with real-time valency validation." },
+    { title: "VSEPR 3D Molecular Shapes", cat: "Simulations", action: () => { window.location.href = "simulations.html"; }, desc: "Valence Shell Electron Pair Repulsion 3D geometry modeler." },
+    { title: "Infrared (IR) Spectroscopy", cat: "Spectroscopy", action: () => { window.location.href = "spectroscopy.html"; }, desc: "FTIR functional group absorption band simulator." },
+    { title: "NMR Spectroscopy & Chemical Shifts", cat: "Spectroscopy", action: () => { window.location.href = "spectroscopy.html"; }, desc: "1H and 13C chemical shift multiplet calculator." },
+    { title: "UV-Vis & Beer-Lambert Law", cat: "Spectroscopy", action: () => { window.location.href = "spectroscopy.html"; }, desc: "Spectrophotometer absorbance and concentration calculator." },
+    { title: "Mass Spectrometry (m/z)", cat: "Spectroscopy", action: () => { window.location.href = "spectroscopy.html"; }, desc: "Molecular ion, base peak, and fragmentation analyzer." }
   ];
 
   window.openSearchPalette = function() {
@@ -647,9 +686,27 @@
     }
   });
 
+  function init3DFeatureTilt() {
+    const cards = document.querySelectorAll(".feature-box-3d");
+    cards.forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        const tiltX = -(y / (rect.height / 2)) * 9;
+        const tiltY = (x / (rect.width / 2)) * 9;
+        card.style.transform = `perspective(1000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) translateY(-8px) scale3d(1.02, 1.02, 1.02)`;
+      });
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  }
+
   window.addEventListener("DOMContentLoaded", () => {
     typeHeroLoop();
     setupToolsFilter();
+    init3DFeatureTilt();
 
     const searchInput = document.getElementById("searchPaletteInput");
     if (searchInput) {

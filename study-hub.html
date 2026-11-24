@@ -24,8 +24,11 @@
           </div>
           <span>Chem<span class="brand-text-ai">AI</span></span>
         </a>
-        <nav class="nav-links" id="siteNavLinks"><a href="index.html" class="nav-link ">Home</a><a href="index.html#ai-assistant" class="nav-link ">AI Assistant</a><a href="tools.html" class="nav-link ">Tools</a><a href="virtual-lab.html" class="nav-link ">Virtual Lab</a><a href="periodic-table.html" class="nav-link ">Periodic Table</a><a href="index.html#molecule-viewer" class="nav-link ">3D Molecules</a><a href="study-hub.html" class="nav-link active">Study Hub</a><a href="index.html#research" class="nav-link ">Research</a></nav>
+        <nav class="nav-links" id="siteNavLinks"><a href="index.html" class="nav-link">Home</a><a href="index.html#ai-assistant" class="nav-link">AI Assistant</a><a href="tools.html" class="nav-link">Tools</a><a href="virtual-lab.html" class="nav-link">Virtual Lab</a><a href="simulations.html" class="nav-link">Simulations</a><a href="periodic-table.html" class="nav-link">Periodic Table</a><a href="index.html#molecule-viewer" class="nav-link">3D Molecules</a><a href="study-hub.html" class="nav-link active">Study Hub</a><a href="spectroscopy.html" class="nav-link">Spectroscopy</a></nav>
         <div class="nav-actions">
+          <button type="button" class="btn-icon theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark/light theme" title="Toggle theme">
+            <span class="theme-toggle-icon">☀️</span>
+          </button>
           <button type="button" class="nav-search-btn" onclick="openSearchPalette()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span>Search</span>
@@ -44,84 +47,189 @@
       <p class="sec-subtitle">Sharpen your understanding with interactive quizzes and generate AI revision sheets.</p>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
-      <div class="glass-card">
-        <h3 style="font-size:1.3rem;margin-bottom:1rem;color:#fff;">Practice Quiz Session</h3>
+      <!-- Quiz Generator Card -->
+      <div class="glass-card" id="quiz">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h3 style="font-size:1.3rem;margin:0;color:var(--text-highlight);">Chemistry Quiz Generator</h3>
+          <span class="chip chip-emerald">20 Topics · 4 Tiers</span>
+        </div>
         <div id="quizSetupPanel">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
             <div class="calc-form-group">
-              <label class="calc-label">Topic</label>
+              <label class="calc-label">Chemistry Discipline</label>
               <div class="calc-input-wrapper">
                 <select id="quizTopicSelect" class="calc-input">
-                  <option value="all">All Topics</option>
-                  <option value="bonding">Chemical Bonding</option>
-                  <option value="stoichiometry">Stoichiometry</option>
-                  <option value="acids">Acids &amp; Bases</option>
-                  <option value="thermodynamics">Thermodynamics</option>
+                  <option value="all">All 20 Topics (Comprehensive)</option>
+                  <option value="atomic">1. Atomic Structure &amp; Periodicity</option>
+                  <option value="bonding">2. Chemical Bonding &amp; VSEPR</option>
+                  <option value="thermo">3. Thermodynamics &amp; Enthalpy</option>
+                  <option value="kinetics">4. Kinetics &amp; Rate Laws</option>
+                  <option value="equilibrium">5. Equilibrium &amp; Buffers</option>
+                  <option value="electrochem">6. Electrochemistry &amp; Redox</option>
+                  <option value="solutions">7. Solutions &amp; Colligative</option>
+                  <option value="gases">8. Gas Laws &amp; States of Matter</option>
+                  <option value="surface">9. Surface Chemistry &amp; Colloids</option>
+                  <option value="coordination">10. Coordination Compounds</option>
+                  <option value="goc">11. General Organic Chemistry (GOC)</option>
+                  <option value="hydrocarbons">12. Hydrocarbons (Alkanes/Enes/Ynes)</option>
+                  <option value="haloalkanes">13. Haloalkanes &amp; Haloarenes</option>
+                  <option value="alcohols">14. Alcohols, Phenols &amp; Ethers</option>
+                  <option value="carbonyls">15. Aldehydes &amp; Ketones</option>
+                  <option value="nitrogen">16. Amines &amp; Nitrogen Compounds</option>
+                  <option value="biomolecules">17. Biomolecules &amp; Polymers</option>
+                  <option value="environmental">18. Environmental Chemistry</option>
+                  <option value="spectroscopy">19. Spectroscopy (IR/NMR/UV)</option>
+                  <option value="stoichiometry">20. Stoichiometry &amp; Mole Concept</option>
                 </select>
               </div>
             </div>
             <div class="calc-form-group">
-              <label class="calc-label">Difficulty</label>
+              <label class="calc-label">Difficulty Tier</label>
               <div class="calc-input-wrapper">
                 <select id="quizDiffSelect" class="calc-input">
-                  <option value="all">All Levels</option>
-                  <option value="easy">Foundations</option>
-                  <option value="medium">Standard AP/CBSE</option>
-                  <option value="hard">Advanced</option>
+                  <option value="all">All Difficulty Levels</option>
+                  <option value="easy">Easy (Foundations)</option>
+                  <option value="medium">Medium (AP / JEE Main)</option>
+                  <option value="hard">Hard (JEE Advanced / Olympiad)</option>
+                  <option value="expert">Expert (Graduate / Competitive)</option>
                 </select>
               </div>
             </div>
           </div>
-          <button class="btn btn-primary" onclick="startQuiz()" style="width:100%;">Start Quiz Session →</button>
-        </div>
-        <div id="quizActivePanel" style="display:none;">
-          <div style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.85rem;margin-bottom:0.75rem;">
-            <span id="quizQuestionCounter" class="mono text-emerald">Question 1</span>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+            <div class="calc-form-group">
+              <label class="calc-label">Practice Mode</label>
+              <div class="calc-input-wrapper">
+                <select id="quizModeSelect" class="calc-input">
+                  <option value="practice">Practice Mode (Instant Feedback)</option>
+                  <option value="timed">Timed Mode (20s Countdown/Q)</option>
+                  <option value="exam">Exam Mode (Final Scorecard)</option>
+                </select>
+              </div>
+            </div>
+            <div class="calc-form-group">
+              <label class="calc-label">Question Count</label>
+              <div class="calc-input-wrapper">
+                <select id="quizCountSelect" class="calc-input">
+                  <option value="5">5 Questions (Sprint)</option>
+                  <option value="10" selected>10 Questions (Standard)</option>
+                  <option value="15">15 Questions (Thorough)</option>
+                  <option value="20">20 Questions (Mastery)</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <h4 id="quizQuestionText" style="color:#fff;font-size:1.05rem;margin-bottom:1rem;line-height:1.4;">Question loading...</h4>
-          <div id="quizOptionsContainer" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
-          <div id="quizExplanationBox" style="display:none;background:var(--bg-deep);padding:0.75rem;border-left:3px solid var(--color-emerald);margin-bottom:1rem;font-size:0.88rem;"></div>
-          <div style="text-align:right;"><button id="quizNextBtn" class="btn btn-primary btn-sm" onclick="advanceQuizQuestion()" disabled>Next Question →</button></div>
+          <button class="btn btn-primary" onclick="startQuiz()" style="width:100%;">
+            <span>Launch Quiz Session</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
         </div>
+
+        <!-- Active Quiz Question Panel -->
+        <div id="quizActivePanel" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span id="quizQuestionCounter" class="mono text-emerald" style="font-weight:700;">Question 1</span>
+              <span id="quizQuestionDiff" class="chip chip-emerald">EASY</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span id="quizQuestionTopic" style="font-size:0.8rem;color:var(--text-dim);">Topic</span>
+              <span id="quizTimerBadge" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--color-rose);padding:0.2rem 0.5rem;border-radius:4px;font-size:0.8rem;font-weight:700;">
+                ⏱ <span id="quizTimerCount">20s</span>
+              </span>
+            </div>
+          </div>
+          <h4 id="quizQuestionText" style="color:var(--text-highlight);font-size:1.08rem;margin-bottom:1rem;line-height:1.45;">Question loading...</h4>
+          <div id="quizOptionsContainer" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+          <div id="quizExplanationBox" style="display:none;background:var(--bg-deep);padding:0.85rem;border-left:3px solid var(--color-emerald);border-radius:0 6px 6px 0;margin-bottom:1rem;font-size:0.88rem;line-height:1.5;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button class="btn btn-ghost btn-sm" onclick="restartQuiz()">Abort</button>
+            <button id="quizNextBtn" class="btn btn-primary btn-sm" onclick="advanceQuizQuestion()" disabled>Next Question →</button>
+          </div>
+        </div>
+
+        <!-- Quiz Result Dashboard Panel -->
         <div id="quizResultPanel" style="display:none;text-align:center;padding:1rem;">
-          <h4 style="color:#fff;font-size:1.3rem;">Quiz Complete!</h4>
-          <div id="quizScoreDisplay" style="font-size:2rem;color:var(--color-emerald);font-weight:800;margin:0.5rem 0;">0 / 0</div>
-          <p id="quizFeedbackMessage" style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">Practice again to improve!</p>
-          <button class="btn btn-primary btn-sm" onclick="restartQuiz()">Practice Again</button>
+          <div style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.25rem;">PERFORMANCE SCORECARD</div>
+          <h4 style="color:var(--text-highlight);font-size:1.5rem;margin-bottom:0.5rem;">Quiz Complete!</h4>
+          <div id="quizScoreDisplay" style="font-size:2.25rem;color:var(--color-emerald);font-weight:800;margin:0.25rem 0;">0 / 0 (0%)</div>
+          <div style="display:flex;justify-content:center;gap:1rem;margin:0.75rem 0;">
+            <span class="chip chip-emerald" id="quizGradeBadge">Proficient</span>
+            <span class="chip chip-cobalt">Time: <strong id="quizTimeDisplay" style="margin-left:0.2rem;">0s</strong></span>
+          </div>
+          <p id="quizFeedbackMessage" style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.25rem;line-height:1.5;">Practice again to improve!</p>
+          <div style="display:flex;gap:0.75rem;justify-content:center;margin-bottom:1rem;">
+            <button class="btn btn-primary btn-sm" onclick="restartQuiz()">New Session</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleQuizReview()">Review Explanations</button>
+          </div>
+          <div id="quizReviewContainer" style="display:none;margin-top:1.25rem;max-height:280px;overflow-y:auto;text-align:left;"></div>
         </div>
       </div>
 
-      <div class="glass-card">
-        <h3 style="font-size:1.3rem;margin-bottom:1rem;color:#fff;">AI Study Notes Generator</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+      <!-- AI Notes Generator Card -->
+      <div class="glass-card" id="notes">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h3 style="font-size:1.3rem;margin:0;color:var(--text-highlight);">AI Study Notes Generator</h3>
+          <span class="chip chip-cyan">10 Branches · 10 Styles</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
           <div class="calc-form-group">
-            <label class="calc-label">Topic</label>
+            <label class="calc-label">Chemistry Discipline</label>
             <div class="calc-input-wrapper">
               <select id="notesTopicSelect" class="calc-input">
-                <option value="bonding">Chemical Bonding &amp; VSEPR</option>
-                <option value="thermodynamics">Thermodynamics</option>
-                <option value="acids">Acids, Bases &amp; Buffers</option>
+                <option value="physical">Physical Chemistry</option>
+                <option value="organic">Organic Chemistry</option>
+                <option value="inorganic">Inorganic Chemistry</option>
+                <option value="analytical">Analytical Chemistry</option>
+                <option value="biochemistry">Biochemistry</option>
+                <option value="environmental">Environmental Chemistry</option>
+                <option value="industrial">Industrial Chemistry</option>
+                <option value="electrochem">Electrochemistry &amp; Energy</option>
+                <option value="thermo">Chemical Thermodynamics</option>
+                <option value="spectroscopy">Spectroscopy &amp; Characterization</option>
               </select>
             </div>
           </div>
           <div class="calc-form-group">
-            <label class="calc-label">Level</label>
+            <label class="calc-label">Note Format Style</label>
             <div class="calc-input-wrapper">
-              <select id="notesLevelSelect" class="calc-input">
-                <option value="AP Chemistry">AP / IB HL</option>
-                <option value="CBSE Classes 11-12">CBSE / State Boards</option>
-                <option value="Undergraduate Chemistry">College</option>
+              <select id="notesStyleSelect" class="calc-input">
+                <option value="summary">Executive Summary</option>
+                <option value="textbook">Comprehensive In-Depth Guide</option>
+                <option value="formulas">Formulas &amp; Equation Sheet</option>
+                <option value="flashcards">Flashcard Bullet Points</option>
+                <option value="exam_sheet">High-Yield Exam Cheat Sheet</option>
+                <option value="mechanisms">Reaction Mechanisms</option>
+                <option value="pitfalls">Common Student Pitfalls</option>
+                <option value="qa">Conceptual Q&amp;A Drill</option>
+                <option value="mnemonics">Mnemonics &amp; Memory Tricks</option>
+                <option value="research">Contemporary Research Highlights</option>
               </select>
             </div>
           </div>
         </div>
-        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;">
-          <button class="btn btn-primary btn-sm" onclick="generateAINotes()" style="flex:1;">Generate Notes</button>
-          <button class="btn btn-ghost btn-sm" onclick="copyNotesToClipboard()">Copy</button>
+        <div class="calc-form-group" style="margin-bottom:1.25rem;">
+          <label class="calc-label">Academic Target Level</label>
+          <div class="calc-input-wrapper">
+            <select id="notesLevelSelect" class="calc-input">
+              <option value="AP Chemistry">AP / IB HL Chemistry</option>
+              <option value="CBSE Classes 11-12">CBSE / State Senior Secondary</option>
+              <option value="Undergraduate Chemistry">College / Undergraduate Chemistry</option>
+              <option value="Competitive Exam">Olympiad / Entrance Exam (JEE/NEET)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="generateAINotes()" style="flex:2;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span>Generate Notes</span>
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="copyNotesToClipboard()">Copy Text</button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadNotesMarkdown()">Download .MD</button>
           <button class="btn btn-ghost btn-sm" onclick="printNotes()">Print</button>
         </div>
-        <div id="notesOutputContent" style="background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1rem;max-height:300px;overflow-y:auto;font-size:0.9rem;">
-          <p style="color:var(--text-dim);font-style:italic;">Click "Generate Notes" to create a study revision sheet.</p>
+        <div id="notesOutputContent" style="background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1.25rem;max-height:360px;overflow-y:auto;font-size:0.9rem;">
+          <p style="color:var(--text-dim);font-style:italic;">Select a branch, style, and academic level, then click "Generate Notes" to produce structured study guides.</p>
         </div>
       </div>
     </div>
@@ -167,6 +275,7 @@
   <script src="js/calculators.js"></script>
   <script src="js/periodic-table.js"></script>
   <script src="js/virtual-lab.js"></script>
+  <script src="js/quiz-data.js"></script>
   <script src="js/quiz-engine.js"></script>
   <script src="js/notes-generator.js"></script>
   <script src="js/app.js"></script>

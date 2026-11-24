@@ -1,23 +1,31 @@
 ﻿/* ==========================================================================
-   ChemAI Platform - Interactive Periodic Table Styles (118 Elements)
+   ChemAI Platform - Upgraded 3D Interactive Periodic Table Styles (118 Elements)
    ========================================================================== */
 
 .ptable-container {
   background: var(--bg-surface);
   border: 1px solid var(--border-emerald);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), var(--border-glow);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), var(--border-glow);
   padding: 1.75rem;
   overflow-x: auto;
   position: relative;
+  perspective: 1200px;
 }
 
 .ptable-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 1.75rem;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ptable-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -28,8 +36,9 @@
   background: var(--bg-deep);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1rem;
   min-width: 280px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .ptable-search-wrapper input {
@@ -41,163 +50,225 @@
   width: 100%;
 }
 
+.ptable-sort-select {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
 /* Category Legend Pills */
 .ptable-legend {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
 .legend-pill {
-  padding: 0.3rem 0.65rem;
-  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
   border: 1px solid transparent;
   opacity: 0.85;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .legend-pill:hover, .legend-pill.active {
   opacity: 1;
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Category Colors */
-.cat-alkali-metal { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #fca5a5; }
-.cat-alkaline-earth { background: rgba(249, 115, 22, 0.2); border-color: #f97316; color: #fdba74; }
-.cat-transition-metal { background: rgba(234, 179, 8, 0.2); border-color: #eab308; color: #fde047; }
-.cat-post-transition { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; }
-.cat-metalloid { background: rgba(6, 182, 212, 0.2); border-color: #06b6d4; color: #67e8f9; }
-.cat-reactive-nonmetal { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #93c5fd; }
-.cat-halogen { background: rgba(99, 102, 241, 0.2); border-color: #6366f1; color: #a5b4fc; }
-.cat-noble-gas { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe; }
-.cat-lanthanide { background: rgba(236, 72, 153, 0.2); border-color: #ec4899; color: #f9a8d4; }
-.cat-actinide { background: rgba(244, 63, 94, 0.2); border-color: #f43f5e; color: #fda4af; }
+/* Category Gradient & Glowing Theme Colors */
+.cat-alkali-metal {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.15) 100%);
+  border-color: #ef4444;
+  color: #fca5a5;
+  box-shadow: inset 0 1px 0 rgba(239, 68, 68, 0.4);
+}
+.cat-alkaline-earth {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(194, 65, 12, 0.15) 100%);
+  border-color: #f97316;
+  color: #fdba74;
+  box-shadow: inset 0 1px 0 rgba(249, 115, 22, 0.4);
+}
+.cat-transition-metal {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.25) 0%, rgba(161, 98, 7, 0.15) 100%);
+  border-color: #eab308;
+  color: #fde047;
+  box-shadow: inset 0 1px 0 rgba(234, 179, 8, 0.4);
+}
+.cat-post-transition {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(4, 120, 87, 0.15) 100%);
+  border-color: #10b981;
+  color: #6ee7b7;
+  box-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.4);
+}
+.cat-metalloid {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(14, 116, 144, 0.15) 100%);
+  border-color: #06b6d4;
+  color: #67e8f9;
+  box-shadow: inset 0 1px 0 rgba(6, 182, 212, 0.4);
+}
+.cat-reactive-nonmetal {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(29, 78, 216, 0.15) 100%);
+  border-color: #3b82f6;
+  color: #93c5fd;
+  box-shadow: inset 0 1px 0 rgba(59, 130, 246, 0.4);
+}
+.cat-halogen {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(67, 56, 202, 0.15) 100%);
+  border-color: #6366f1;
+  color: #a5b4fc;
+  box-shadow: inset 0 1px 0 rgba(99, 102, 241, 0.4);
+}
+.cat-noble-gas {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(126, 34, 206, 0.15) 100%);
+  border-color: #a855f7;
+  color: #d8b4fe;
+  box-shadow: inset 0 1px 0 rgba(168, 85, 247, 0.4);
+}
+.cat-lanthanide {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(190, 24, 93, 0.15) 100%);
+  border-color: #ec4899;
+  color: #f9a8d4;
+  box-shadow: inset 0 1px 0 rgba(236, 72, 153, 0.4);
+}
+.cat-actinide {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.25) 0%, rgba(190, 18, 60, 0.15) 100%);
+  border-color: #f43f5e;
+  color: #fda4af;
+  box-shadow: inset 0 1px 0 rgba(244, 63, 94, 0.4);
+}
 
-/* The Standard 18x7 Periodic Table Grid */
+/* 3D Periodic Table Grid */
 .ptable-grid {
   display: grid;
   grid-template-columns: repeat(18, minmax(58px, 1fr));
-  gap: 4px;
-  min-width: 1080px;
+  gap: 5px;
+  min-width: 1100px;
+  perspective: 800px;
 }
 
+/* 3D Cell Design with Elevation & Hover Tilts */
 .element-cell {
-  aspect-ratio: 1 / 1.15;
-  background: rgba(17, 34, 64, 0.6);
-  border: 1px solid rgba(226, 232, 240, 0.12);
+  aspect-ratio: 1 / 1.18;
   border-radius: var(--radius-sm);
-  padding: 4px 6px;
+  padding: 4px 5px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
   position: relative;
-  overflow: hidden;
   user-select: none;
+  transform-style: preserve-3d;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .element-cell:hover {
-  transform: scale(1.15);
+  transform: translateY(-6px) rotateX(8deg) scale(1.08);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5), 0 0 14px currentColor;
   z-index: 10;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 14px currentColor;
-  border-color: currentColor;
+  border-width: 1.5px;
 }
 
 .element-cell.dimmed {
   opacity: 0.18;
   filter: grayscale(80%);
+  pointer-events: none;
 }
 
-.element-cell.highlighted {
-  transform: scale(1.12);
-  z-index: 9;
-  box-shadow: 0 0 16px var(--color-emerald);
-  border-color: var(--color-emerald);
-}
-
-.cell-top {
+.element-cell .cell-top {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.68rem;
   font-family: var(--font-mono);
-  color: var(--text-muted);
-}
-
-.cell-symbol {
-  font-size: 1.25rem;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  text-align: center;
-  color: var(--text-highlight);
+  font-weight: 700;
+  color: var(--text-dim);
   line-height: 1;
 }
 
-.cell-name {
-  font-size: 0.65rem;
-  color: var(--text-muted);
+.element-cell .cell-symbol {
+  font-size: 1.35rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1;
+  margin: 2px 0;
+  font-family: var(--font-mono);
+  color: var(--text-highlight);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.element-cell .cell-name {
+  font-size: 0.62rem;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* Blank spacer cells */
 .ptable-spacer {
   pointer-events: none;
 }
 
-/* Lanthanide & Actinide separated block below */
+/* f-Block Subgrid */
 .ptable-f-block {
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   display: grid;
-  grid-template-columns: repeat(18, minmax(58px, 1fr));
-  gap: 4px;
-  min-width: 1080px;
+  grid-template-columns: 140px repeat(15, minmax(58px, 1fr));
+  gap: 5px;
+  min-width: 1100px;
 }
 
 .f-block-label {
-  grid-column: span 3;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-right: 1rem;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-/* Element Detail Modal / Inspector Drawer */
-.element-modal-grid {
+/* Comprehensive Modal Styles */
+.ptable-modal-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 260px 1fr;
+  gap: 1.75rem;
+  align-items: start;
 }
 
-@media (max-width: 640px) {
-  .element-modal-grid {
+@media (max-width: 768px) {
+  .ptable-modal-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.element-hero-card {
+.element-big-card {
   background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 2rem;
+  padding: 1.5rem;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  border: 1px solid var(--border-subtle);
-  position: relative;
+  gap: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .element-big-symbol {
@@ -205,35 +276,41 @@
   font-weight: 900;
   font-family: var(--font-mono);
   line-height: 1;
-  margin-bottom: 0.5rem;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.6);
 }
 
-/* Electron Shell Circles */
 .bohr-model-canvas {
-  width: 160px;
-  height: 160px;
-  margin: 1rem 0;
+  width: 180px;
+  height: 180px;
+  display: block;
+  margin: 0.5rem auto;
 }
 
 .element-props-table {
   width: 100%;
   border-collapse: collapse;
-}
-
-.element-props-table td {
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border-subtle);
   font-size: 0.88rem;
 }
 
+.element-props-table tr {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.element-props-table tr:last-child {
+  border-bottom: none;
+}
+
+.element-props-table td {
+  padding: 0.55rem 0.75rem;
+}
+
 .element-props-table td:first-child {
-  color: var(--text-muted);
-  font-weight: 500;
+  color: var(--text-dim);
+  font-weight: 600;
+  width: 38%;
 }
 
 .element-props-table td:last-child {
-  text-align: right;
-  font-family: var(--font-mono);
   color: var(--text-highlight);
   font-weight: 600;
 }

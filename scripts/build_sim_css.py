@@ -1,0 +1,178 @@
+﻿import os
+
+content = """/* ==========================================================================
+   ChemAI Platform - Virtual Chemistry Simulation Hub Styles
+   ========================================================================== */
+
+.sim-hub-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .sim-hub-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sim-nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  width: 100%;
+}
+
+.sim-nav-tab:hover {
+  border-color: var(--color-emerald);
+  color: var(--text-highlight);
+  background: var(--bg-surface-elevated);
+}
+
+.sim-nav-tab.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--color-emerald);
+  color: var(--color-emerald);
+}
+
+.sim-workspace-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.sim-canvas-box {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.sim-canvas-box canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Palette Bar */
+.atom-palette-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.atom-palette-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: var(--bg-surface-elevated);
+  color: #fff;
+}
+
+.atom-palette-btn:hover, .atom-palette-btn.active {
+  transform: scale(1.15);
+  border-color: #fff;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.bond-tool-btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.bond-tool-btn.active, .bond-tool-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--color-emerald);
+  color: var(--color-emerald);
+}
+
+/* Aufbau Orbital Boxes */
+.aufbau-energy-levels {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.aufbau-level-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.aufbau-label {
+  width: 45px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--color-emerald);
+  font-size: 0.95rem;
+}
+
+.orbital-boxes-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.orbital-box {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border-subtle);
+  background: var(--bg-deep);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-cyan);
+}
+
+.orbital-box.occupied {
+  border-color: var(--color-emerald);
+  background: rgba(16, 185, 129, 0.1);
+}
+"""
+
+with open("css/simulations.css", "w", encoding="utf-8") as f:
+    f.write(content)
+print("Wrote css/simulations.css")
