@@ -1253,14 +1253,34 @@
             <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">
               Generate high-yield revision summaries with definitions, formulas, reaction mechanisms, and exam reminders.
             </p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;">
               <div class="calc-form-group">
                 <label class="calc-label">Chemistry Topic</label>
                 <div class="calc-input-wrapper">
                   <select id="notesTopicSelect" class="calc-input" style="cursor:pointer;">
                     <option value="bonding">Chemical Bonding &amp; VSEPR</option>
-                    <option value="thermodynamics">Thermodynamics &amp; Free Energy</option>
-                    <option value="acids">Acids, Bases &amp; Buffer Solutions</option>
+                    <option value="thermodynamics">Thermodynamics &amp; Spontaneity</option>
+                    <option value="acids">Acids, Bases &amp; Buffer Systems</option>
+                    <option value="physical">Physical Chemistry &amp; Kinetics</option>
+                    <option value="organic">Organic Chemistry &amp; Mechanisms</option>
+                    <option value="inorganic">Inorganic &amp; Coordination</option>
+                    <option value="electrochem">Electrochemistry &amp; Batteries</option>
+                    <option value="spectroscopy">Spectroscopy (NMR, IR, MS)</option>
+                    <option value="analytical">Analytical Chemistry</option>
+                    <option value="biochemistry">Biochemistry &amp; Enzymes</option>
+                  </select>
+                </div>
+              </div>
+              <div class="calc-form-group">
+                <label class="calc-label">Note Format Style</label>
+                <div class="calc-input-wrapper">
+                  <select id="notesStyleSelect" class="calc-input" style="cursor:pointer;">
+                    <option value="summary">Executive Summary</option>
+                    <option value="textbook">In-Depth Reference Guide</option>
+                    <option value="formulas">Formulas &amp; Equation Sheet</option>
+                    <option value="flashcards">Active Recall Flashcards</option>
+                    <option value="exam_sheet">High-Yield Exam Cheat Sheet</option>
+                    <option value="pitfalls">Common Student Pitfalls</option>
                   </select>
                 </div>
               </div>
@@ -1269,15 +1289,20 @@
                 <div class="calc-input-wrapper">
                   <select id="notesLevelSelect" class="calc-input" style="cursor:pointer;">
                     <option value="AP Chemistry">AP Chemistry / IB HL</option>
-                    <option value="CBSE Classes 11-12">CBSE / State Boards (India)</option>
+                    <option value="CBSE Classes 11-12">CBSE / State Boards</option>
                     <option value="Undergraduate Chemistry">College / Undergraduate</option>
+                    <option value="Competitive Exam">Olympiad / Entrance Exam</option>
                   </select>
                 </div>
               </div>
             </div>
-            <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;">
-              <button type="button" class="btn btn-primary" onclick="generateAINotes()" style="flex:1;">Generate Notes</button>
+            <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+              <button type="button" class="btn btn-primary" onclick="generateAINotes()" style="flex:2;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M12 2v20M2 12h20"/></svg>
+                <span>Generate Notes</span>
+              </button>
               <button type="button" class="btn btn-ghost" onclick="copyNotesToClipboard()" title="Copy formatted text">Copy Text</button>
+              <button type="button" class="btn btn-ghost" onclick="downloadNotesMarkdown()" title="Download as Markdown file">Download .MD</button>
               <button type="button" class="btn btn-ghost" onclick="printNotes()" title="Print / Save PDF">Print</button>
             </div>
             <!-- Output Sheet -->

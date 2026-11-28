@@ -60,9 +60,10 @@ class ChatRequest(BaseModel):
     history: Optional[List[ChatMessage]] = []
 
 class NotesRequest(BaseModel):
-    topic: str
+    topic: Optional[str] = "General Chemistry"
     branch: Optional[str] = "General Chemistry"
-    style: Optional[str] = "detailed"
+    style: Optional[str] = "summary"
+    level: Optional[str] = "AP / Undergraduate Chemistry"
 
 @app.get("/api/health")
 def health_check():
@@ -124,6 +125,10 @@ def chat_endpoint(req: ChatRequest):
 
 @app.post("/api/generate-notes")
 def generate_notes_endpoint(req: NotesRequest):
+    topic = req.topic or req.branch or "General Chemistry"
+    branch = req.branch or req.topic or "General Chemistry"
+    style = req.style or "summary"
+    level = req.level or "AP / Undergraduate Chemistry"
     api_key = os.environ.get("GEMINI_API_KEY", "")
 
     if api_key:
@@ -133,9 +138,10 @@ def generate_notes_endpoint(req: NotesRequest):
 
             client = genai.Client(api_key=api_key)
             prompt = f"""Generate comprehensive chemistry study notes for:
-Topic: {req.topic}
-Branch: {req.branch}
-Format: {req.style}
+Topic: {topic}
+Branch: {branch}
+Academic Level: {level}
+Format / Style: {style}
 
 Include:
 1. Introduction & Overview
